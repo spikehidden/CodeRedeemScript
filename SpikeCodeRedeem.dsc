@@ -68,7 +68,7 @@ SpikeCodeRedeemData:
     # ------ Debug & Log ------
     # Shall redemption be logged?
     redemptionLog: true
-    logPath: spikehidden/logs/CodeRedemption.log
+    logPath: spikehidden/logs/
 
     # ------ Advanced Settings ------
     # Don't change this unless Pastebin changed their API endpoints
@@ -218,14 +218,14 @@ SpikeCodeRedeemAdminCommand:
         2: <server.flag[redeemableCodes].if_null[No codes found]>|random
         3: 1|10|100|unlimited
         4: <server.commands>|<server.flag[commandGroups].as_list>
-        5: permission
-        default: Too many arguments! Try putting the arguments in quotes (<&dq><&dq>)!
+        default: <&lt>command<&gt>
     script:
-    - define setting <context.args[1].if_null[null]>
-    - define code <context.args[2].if_null[null]>
-    - define amount <context.args[3].if_null[null]>
-    - define command <context.args[4].if_null[null]>
-    - define permission <context.args[5].if_null[null]>
+    - define setting <context.args.get[1].if_null[null]>
+    - define code <context.args.get[2].if_null[null]>
+    - define amount <context.args.get[3].if_null[null]>
+    - define command <context.args.get[4].to[last].space_separated.if_null[null]>
+ #   - define permission <context.args[5].if_null[null]>
+    - define permission null
     - if <[setting]> == null || <[code]> == null:
         - narrate "Missing arguments!"
     # - Create
@@ -268,6 +268,7 @@ SpikeCodeRedeemAdminCommand:
 # + Command for redeeming codes.
 spikeCodeRedeemCommand:
     type: command
+    debug: true
     name: redeem
     description: Command to redeem codes
     usage: /redeem <&lb><&lt>code<&gt><&rb>
@@ -287,9 +288,9 @@ spikeCodeRedeemCommand:
         - narrate 'This command can only be executed by a player!'
         - stop
     # Define stuf!! STUFF!!
-    - define code <context.args[1].as_string>
+    - define code <context.args.get[1]>
     - define log <script[SpikeCodeRedeemData].data_key[redemptionLog]>
-    - define logPath <script[SpikeCodeRedeemData].data_key[logPath]>
+    - define logPath <script[SpikeCodeRedeemData].data_key[logPath]>CodeRedemption_<util.time_now.format[yyyy-MM-dd]>.log
     # Check if the code exists!
     - if <server.has_flag[redeemableCodes.<[code]>]>:
         # Define more stuff!
@@ -314,18 +315,23 @@ spikeCodeRedeemCommand:
         - define msg 'The specified code "<[code]>" does not exist!'
     # Check if the Player can redeem the code
     - if <[mayRedeem]>:
-        # If so execute the saved commands.
-        - foreach <[commands]> as:cmd:
-            - define command <[cmd].replace_text[$(player)].with[<player.name>]>
-            - execute as_server <[command]>
+        # Check if player not already used the code.
+        - if not <server.flag[redeemableCodes.<[code]>.usedBy].contains_any[<player>].if_null[false]>:
+            # If so execute the saved commands.
+            - foreach <[commands]> as:cmd:
+                - define command <[cmd].replace_text[$(player)].with[<player.name>]>
+                - execute as_server <[command]>
             # Log execution of each command if it's enabled in the settings.
-            - if <[log]>:
-                - ~log '<player.name> <&lb><player.uuid><&rb> | Player used "<[code]>" to execute "/<[command]>" as console' file:<[logPath]>
-        # Define message
-        - define msg 'Code succesfully redeemed!'
-        # Reduce amount if not unlimited
-        - if <[amount].is_decimal> && <[amount]> != unlimited:
-            - flag server redeemableCodes.<[code]>.amount:--
+                - if <[log]>:
+                    - ~log '<player.name> <&lb><player.uuid><&rb> | Player used "<[code]>" to execute "/<[command]>" as console' file:<[logPath]>
+            # Define message
+            - define msg 'Code succesfully redeemed!'
+            - flag server redeemableCodes.<[code]>.usedBy:->:<player>
+            # Reduce amount if not unlimited
+            - if <[amount].is_decimal> && <[amount]> != unlimited:
+                - flag server redeemableCodes.<[code]>.amount:--
+        - else:
+            - define msg 'You already have redeemed this code.'
     - narrate <[msg]>
 
 # + Command for bulk creating codes +

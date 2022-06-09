@@ -55,7 +55,8 @@ SpikeCodeRedeemData:
     # Do you want to use private or public pastes on Pastebin.com ?
     # You can find more info in the readme at https://github.com/spikehidden/XXX
     # Default is false as it is NOT recommended to use this feature!
-    UsePastebin: false
+    UsePastebin: true
+    devKey: pyUudImyS3eAEAy5DcVmbMzAh3S7CJMH
 
     # If it is a public or unlisted paste you don't need to have a user key nor a dev key.
     # But it will ONLY allow the use of md5 hashes as public pastes can be viewed by anyone.
@@ -73,7 +74,7 @@ SpikeCodeRedeemData:
     # ------ Advanced Settings ------
     # Don't change this unless Pastebin changed their API endpoints
     API:
-        endpoint: https://pastebin.com/api/
+        endpoint: pastebin.com/api/
         data: api_raw.php
         login: api_login.php
         paste: api_post.php
@@ -117,19 +118,19 @@ SpikeCodeCreateCode:
 # + Send Code List to Pastebin +
 SpikeCodeSendPastebin:
     type: task
-    definitions: paste_name|paste_content|format|paste_format
+    definitions: player|paste_name|paste_content|format|paste_format
 
     script:
     - define useAPI <script[SpikeCodeRedeemData].data_key[UsePastebin].as_boolean>
     - define API <script[SpikeCodeRedeemData].data_key[API.endpoint]>
     - define endpoint <script[SpikeCodeRedeemData].data_key[API.paste]>
-    - define URI <[API]><[endpoint]>
-    - define devKey <secret[pastebinDevKey].if_null[null]>
+    - define URI https://<[API]><[endpoint]>
+    - define devKey <script[SpikeCodeRedeemData].data_key[devKey].if_null[null]>
     - if <[devKey]> == null:
         - narrate 'No dev key found! For more info look into the configs!'
     - else if <[useAPI].if_null[false]>:
         # If there is a userkey create a private paste.
-        - if <player.has_flag[pastebin.userkey]>:
+        - if <[player].has_flag[pastebin.userkey]>:
             - ~webget <[URI]> data:api_dev_key=<[devKey]>&api_option=paste&api_paste_code=<[paste_content].url_encode>&api_paste_name=<[paste_name]>&api_paste_private=2&api_user_key=<player.flag[pastebin.userkey]> save:link
             - define link <entry[link].result>
             - define msg 'You can find your code list in the <[format]>-format at <[link]>'
@@ -182,15 +183,17 @@ SpikeCodeRedeemPastebinCommand:
         - narrate Missing either username or password!
         - stop
     - else:
-        - define devKey <secret[pastebinDevKey].if_null[null]>
+        - define devKey <script[SpikeCodeRedeemData].data_key[devKey]>
         - define endpoint <script[SpikeCodeRedeemData].data_key[API.endpoint]>
         - define API <script[SpikeCodeRedeemData].data_key[API.login]>
-        - define url <[endpoint]><[API]>
+        - define url https://<[endpoint]><[API]>
         # Check if DevKey exists.
         - if <[devKey]> != null:
-            - ~webget <[url]> data:api_dev_key=<secret[pastebinDevKey]>&api_user_name=<[username]>&api_user_password=<[password]> save:userkey
+            - ~webget <[url]> data:api_dev_key=<[devKey]>&api_user_name=<[username]>&api_user_password=<[password]> save:userkey
             - if !<entry[userkey].failed>:
-                - define msg 'Your userkey "<Element[<entry[userkey].result>].on_click[<entry[userkey].result>].type[COPY_TO_CLIPBOARD]>" was succesfully saved.<&nl>'
+                - define userkey <entry[userkey].result.replace_text[<&nl>]>
+                - flag <player> pastebin.userkey:<[userkey]>
+                - define msg 'Your userkey "<Element[<[userkey]>].on_click[<[userkey]>].type[COPY_TO_CLIPBOARD]>" was succesfully saved.<&nl>'
                 - define msg '<[msg]>There is no reason to regenerate the userkey unless you run into an invalid userkey error!'
                 - narrate <[msg]>
             - else:
@@ -347,22 +350,24 @@ SpikeCodeBulkCodeCreate:
     - determine <player.has_permission[spikehidden.admin]>||<context.server>||<player.has_permission[spikehidden.coderedeem.admin]>||<player.has_permission[spikehidden.coderedeem.codes]>
     tab completions:
         # Code group
-        1: <server.flag[redeemableCodeGroups].as_list>|random
+        1: <server.flag[redeemableCodeGroups].as_list.if_null[<&lt>Code Group Name<&gt>]>
         # amount of codes
         2: 1|2|3|4|5|10|100|1000
-        # commands as list
-        3: <server.commands>|<server.flag[commandGroups].as_list>
         # format
-        4: list|wizebot
-        # permission
-        5: <empty>
-        default: Too many arguments! Try putting the arguments in quotes (<&dq><&dq>)!
+        3: list|wizebot
+        # commands as list
+        4: <server.commands>|<server.flag[commandGroups].as_list.if_null[<empty>]>
+        default: <empty>
+        # default: Too many arguments! Try putting the arguments in quotes (<&dq><&dq>)!
     script:
-    - define group <context.args[1].if_null[null]>
-    - define groupAmount <context.args[2].if_null[null]>
-    - define command <context.args[3].if_null[null]>
-    - define format <context.args[4].if_null[null]>
-    - define permission <context.args[5].if_null[null]>
+    - define args <context.raw_args.split_args>
+    - define group <[args].get[1].if_null[null]>
+    - define groupAmount <[args].get[2].if_null[null]>
+    - define command <[args].get[4].if_null[null]>
+    - define format <[args].get[3].if_null[null]>
+    - define command <[args].get[4].if_null[null]>
+#    - define permission <context.args.get[5].if_null[null]>
+    - define permission null
     - define amount 1
     # check for missing arguments
     - if <[group]> == null || <[groupAmount]> == null || <[command]> == null:
@@ -384,14 +389,14 @@ SpikeCodeBulkCodeCreate:
             - ~webget https://random.justyy.workers.dev/api/random/?n=8&x=6 save:newgroup
             - while <server.has_flag[redeemableGroups.<entry[newgroup].result.replace_text[<&dq>]>]>:
                 - ~webget https://random.justyy.workers.dev/api/random/?n=8&x=6 save:newgroup
-                - if <[loop_index]> >= 10:
+                - if <[loop_index].if_null[1]> >= 10:
                     - narrate 'Could not create an unused random code group name. Try again or if this error persists open an issue on GitHub.'
                     - stop
             - define group <entry[newgroup].result.replace_text[<&dq>]>
         # Sets the amount how may codes are in the group.
         - flag server redeemableGroups.<[group]>.amount:<[amount]>
         # Creates the specified amount of codes.
-        - while <[loop_index]> <= <[groupAmount]>:
+        - while <[loop_index].if_null[1]> <= <[groupAmount]>:
             - ~webget https://random.justyy.workers.dev/api/random/?n=8&x=6 save:newcode
             - while <server.has_flag[redeemableCodes.<entry[newcode].result.replace_text[<&dq>]>]>:
                 - ~webget https://random.justyy.workers.dev/api/random/?n=8&x=6 save:newgroup
@@ -410,6 +415,7 @@ SpikeCodeBulkCodeCreate:
         # If so set the permission.
         - else:
             - define msg 'The group "<[group]>" with <[amount]> possible redemption was created!'
+        - run SpikeCodeSendPastebin def:<player>|<[group]>|<server.flag[redeemableGroups.<[group]>.codes].separated_by[]>|<[format]>
 
 
     # # - Edit
@@ -434,4 +440,4 @@ SpikeCodeBulkCodeCreate:
     #     - else:
     #         - flag server redeemableGroups.<[group]>:!
     #         - define msg 'The group "<[group]>" was succesfully deleted!'
-    # - narrate <[msg]>
+    - narrate <[msg]>

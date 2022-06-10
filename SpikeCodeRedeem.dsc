@@ -53,18 +53,17 @@ SpikeCodeRedeemData:
     type: data
     # ------ Pastebin ------
     # Do you want to use private or public pastes on Pastebin.com ?
-    # You can find more info in the readme at https://github.com/spikehidden/XXX
-    # Default is false as it is NOT recommended to use this feature!
+    # You can find more info in the readme at https://github.com/spikehidden/CodeRedeemScript
+    # Default is true as it is recommended to use this feature when bulk creating codes!
     UsePastebin: true
+    # Put your pastebin devKey in here as it's not possible to retrieve it from the "secrets.secret" file at the moment.
+    # As soon as it is possible we'll do it that way.
     devKey: pyUudImyS3eAEAy5DcVmbMzAh3S7CJMH
 
     # If it is a public or unlisted paste you don't need to have a user key nor a dev key.
     # But it will ONLY allow the use of md5 hashes as public pastes can be viewed by anyone.
     ## NOT RECOMMEND TO USE PUBLIC PASTES AS EVERYONE COULD SEE THE CODES EVEN THOUGH THEY ARE ENCRYPTED!
     IsPublic: false
-    #- Dev Key has to be defined in the "secrets.secret" file as "PastebinDevKey"
-    # More Info about "secrets.secret" can be found here: https://meta.denizenscript.com/Docs/ObjectTypes/SecretTag
-
 
     # ------ Debug & Log ------
     # Shall redemption be logged?
@@ -95,18 +94,24 @@ SpikeCodeRedeemUpdate:
 # + Create Code Task +
 SpikeCodeCreateCode:
     type: task
-    definitions: code|amount|command|permission
+    definitions: code|amount|command|permission|prefix
 
     script:
     # Check if a random code shall be generated
     - if <[code]> == random:
         - ~webget https://random.justyy.workers.dev/api/random/?n=8&x=6 save:newcode
         - define code <entry[newcode].result.replace_text[<&dq>]>
+        - define code <[code].replace_text[<&nl>]>
+        - if <[prefix].exists>:
+            - define code <[prefix]><[code]>
     # Sets the amount how often the code can be used.
     - flag server redeemableCodes.<[code]>.amount:<[amount]>
     # Sets the commands that shall be executed!
-    - flag server redeemableCodes.<[code]>.commands:<list>
-    - flag server redeemableCodes.<[code]>.commands:->:<[command]>
+    - if <[command]> == group:
+        - flag server redeemableCodes.<[code]>.commands:<player.flag[spikehidden.coderedeem.commandgroup]>
+    - else:
+        - flag server redeemableCodes.<[code]>.commands:<list>
+        - flag server redeemableCodes.<[code]>.commands:->:<[command]>
     # Check if a permission shall be set.
     - if <[permission]> != null:
         - define msg 'The code "<[code]>" with <[amount]> possible redemption(s) and the "<[permission]>" permission required was created!'
@@ -136,7 +141,7 @@ SpikeCodeSendPastebin:
             - define msg 'You can find your code list in the <[format]>-format at <[link]>'
             - narrate <[msg]>
         # If there is no userkey, create an unlisted one as pasword protected is not possible with the API at the moment.
-        # - NOTE: Maybe use Pastebin alternative?
+        # - NOTE: Maybe use Pastebin alternative in future?
         - else:
             - ~webget <[URI]> data:api_dev_key=<[devKey]>&api_option=paste&api_paste_code=<[paste_content].url_encode>&api_paste_name=<[paste_name]>&api_paste_private=1&api_paste_expire_date=10M save:link
             - define link <entry[link].result>
@@ -218,21 +223,49 @@ SpikeCodeRedeemAdminCommand:
     - determine <player.has_permission[spikehidden.admin]>||<context.server>||<player.has_permission[spikehidden.coderedeem.admin]>||<player.has_permission[spikehidden.coderedeem.codes]>
     tab completions:
         1: create|edit|delete
-        2: <server.flag[redeemableCodes].if_null[No codes found]>|random
-        3: 1|10|100|unlimited
-        4: <server.commands>|<server.flag[commandGroups].as_list>
-        default: <&lt>command<&gt>
+    tab complete:
+    - if <context.raw_args.split_args.size> >= 2:
+        # If create
+        - if <context.raw_args.split_args.get[1]> == create:
+            - if <context.raw_args.split_args.size> == 2:
+                - determine random|<&lt>code<&gt>
+            - else if <context.raw_args.split_args.size> == 3:
+                - determine 1|10|100|unlimited
+            - else if <context.raw_args.split_args.size> == 4:
+                - determine group|<server.commands>
+            - else if <context.raw_args.split_args.size> >= 5:
+                - determine <&lt>argument<&gt>
+        # If Edit
+        - else if <context.raw_args.split_args.get[1]> == edit:
+            - determine WIP
+        # If delete
+        - else if <context.raw_args.split_args.get[1]> == delete:
+            - if <context.raw_args.split_args.size> == 2:
+                - determine code|group
+            # if code
+            - else if <context.raw_args.split_args.size> == 3 && <context.raw_args.split_args.get[2]> == code:
+                - determine "<server.flag[redeemableCodes].keys.if_null[No codes found]>"
+            # if group
+            - else if <context.raw_args.split_args.size> == 3 && <context.raw_args.split_args.get[2]> == group:
+                - determine "<server.flag[redeemableGroups].keys.if_null[No groups found]>"
+            - else if <context.raw_args.split_args.size> >= 4:
+                - determine "Too many arguments!"
+    - else:
+        - determine <empty>
     script:
-    - define setting <context.args.get[1].if_null[null]>
-    - define code <context.args.get[2].if_null[null]>
-    - define amount <context.args.get[3].if_null[null]>
-    - define command <context.args.get[4].to[last].space_separated.if_null[null]>
- #   - define permission <context.args[5].if_null[null]>
-    - define permission null
-    - if <[setting]> == null || <[code]> == null:
+    - define args <context.raw_args.split_args.if_null[null]>
+    - define setting <[args].get[1].if_null[null]>
+    # check if setting is specified
+    - if <[setting]> == null:
         - narrate "Missing arguments!"
+        - stop
     # - Create
     - else if <[setting]> == create:
+        # define stuff for the create command
+        - define code <[args].get[2].if_null[null]>
+        - define amount <[args].get[3].if_null[null]>
+        - define command <[args].get[4].to[last].space_separated.if_null[null]>
+        - define permission null
         # Check if arguments exist
         - if <[amount]> == null || <[command]> == null:
             - define msg "Missing arguments!"
@@ -244,28 +277,46 @@ SpikeCodeRedeemAdminCommand:
             - define msg 'The specified code already exists! Please use "/redeemsettings edit <[code]>..." instead!'
         - else:
             - inject SpikeCodeCreateCode
+
     # - Edit
-    - else if <[setting]> == edit:
-        - if !<server.has_flag[redeemableCodes.<[code]>]>:
-            - define msg 'The specified Code does not exits! To create one use "/redeemsettings create <[code]>"'
-            - narrate <[msg]>
-            - stop
-        - else if !<[amount].is_decimal> && <[amount]> != unlimited:
-            - define msg 'You have not specified a correct amount!'
-            - narrate <[msg]>
-            - stop
-        - if <[command]> == null:
-            - define command <server.flag[redeemableCodes.<[code]>.commands]>
-        - flag server redeemableCodes.<[code]>.commands:<[command].as_list>
-        - flag server redeemableCodes.<[code]>.amount:<[amount]>
-        - define msg 'The code "<[code]>" with <[amount]> possible redemption was sucessfully edited!'
+    # - else if <[setting]> == edit:
+    #     - if !<server.has_flag[redeemableCodes.<[code]>]>:
+    #         - define msg 'The specified Code does not exits! To create one use "/redeemsettings create <[code]>"'
+    #         - narrate <[msg]>
+    #         - stop
+    #     - else if !<[amount].is_decimal> && <[amount]> != unlimited:
+    #         - define msg 'You have not specified a correct amount!'
+    #         - narrate <[msg]>
+    #         - stop
+    #     - if <[command]> == null:
+    #         - define command <server.flag[redeemableCodes.<[code]>.commands]>
+    #     - flag server redeemableCodes.<[code]>.commands:<[command].as_list>
+    #     - flag server redeemableCodes.<[code]>.amount:<[amount]>
+    #     - define msg 'The code "<[code]>" with <[amount]> possible redemption was sucessfully edited!'
+
     # - Delete
     - else if <[setting]> == delete:
-        - if !<server.has_flag[redeemableCodes.<[code]>]>:
-            - define msg 'The specified Code does not exits! To create one use "/redeemsettings create <[code]>"'
-        - else:
-            - flag server redeemableCodes.<[code]>:!
-            - define msg 'The code "<[code]>" was succesfully deleted!'
+        # Define stuff
+        - define type <[args].get[2]>
+        - define name <[args].get[3]>
+        # If code
+        - if <[type]> == code:
+            - if <server.has_flag[redeemableCodes.<[name]>]>:
+                - flag server redeemableCodes.<[name]>:!
+                - define msg 'The code "<[name]>" was succesfully deleted!'
+            - else:
+                - define msg 'The specified Code does not exits! To create it use "/redeemsettings create <[code]>..."'
+        # If group
+        - if <[type]> == group:
+            - if <server.has_flag[redeemableGroups.<[name]>]>:
+                - define codeCount 0
+                - foreach <server.flag[redeemableGroups.<[name]>.codes]> as:code:
+                    - flag server redeemableCodes.<[code]>:!
+                    - define codeCount:++
+                - flag server redeemableGroups.<[name]>:!
+                - define msg "The code group <&dq><[name]><&dq> with <[codeCount]> code/s was succesfully deleted."
+            - else:
+                - define msg 'The specified group does not exits!"'
     - narrate <[msg]>
 
 # + Command for redeeming codes.
@@ -333,16 +384,30 @@ spikeCodeRedeemCommand:
             # Reduce amount if not unlimited
             - if <[amount].is_decimal> && <[amount]> != unlimited:
                 - flag server redeemableCodes.<[code]>.amount:--
+                # Check if amount is now 0 or below
+                - if <server.flag[redeemableCodes.<[code]>.amount]> <= 0:
+                    # If so check if the code has a group
+                    - if <server.has_flag[redeemableCodes.<[code]>.group]>:
+                        # If so define group for easy mapping
+                        - define group <server.has_flag[redeemableCodes.<[code]>.group]>
+                        # remove code from group
+                        - flag server redeemableGroups.<[group]>.codes:<-:<[code]>
+                        # Check if group is now empty
+                        - if <server.flag[redeemableGroups.<[group]>.codes].size> <= 0:
+                            # If so delete group
+                            - flag server redeemableGroups.<[group]>:!
+                    # Delete code if it has an amount of 0 or below
+                    - flag server redeemableCodes.<[code]>:!
         - else:
             - define msg 'You already have redeemed this code.'
     - narrate <[msg]>
 
 # + Command for bulk creating codes +
-SpikeCodeBulkCodeCreate:
+SpikeCodeRedeemBulkCreate:
     type: command
     name: bulkcodecreate
     description: Admin Settings for Spike's redeemable codes.
-    usage: /bulkcodecreate  <&lb><&lt>code group name<&gt><&rb> <&lb><&lt>amount of codes<&gt><&rb> <&lb><&lt>command<&gt>/group:<&lt>command group<&gt><&rb> (<&lt>format for list export<&gt>) (<&lt>permission<&gt>)
+    usage: /bulkcodecreate  <&lb><&lt>code group name<&gt><&rb> <&lb><&lt>amount of codes<&gt><&rb> <&lb><&lt>command<&gt>/group<&lt>command group<&gt><&rb> (<&lt>format for list export<&gt>) (<&lt>permission<&gt>)
     aliases:
     - bulkcreate
     permission: spikehidden.admin;spikehidden.coderedeem.admin;spikehidden.coderedeem.codes
@@ -355,17 +420,23 @@ SpikeCodeBulkCodeCreate:
         2: 1|2|3|4|5|10|100|1000
         # format
         3: list|wizebot
-        # commands as list
-        4: <server.commands>|<server.flag[commandGroups].as_list.if_null[<empty>]>
         default: <empty>
-        # default: Too many arguments! Try putting the arguments in quotes (<&dq><&dq>)!
+
+    tab complete:
+    - if <context.raw_args.split_args.size> == 4:
+        - determine group|<server.commands>
+    - else if <context.raw_args.split_args.size> == 5:
+        - determine <&lb>prefix<&rb>
+    - else if <context.raw_args.split_args.size> >= 5:
+        - determine "Too many arguments! Try putting the arguments in quotes (<&dq><&dq>)!"
+
     script:
     - define args <context.raw_args.split_args>
     - define group <[args].get[1].if_null[null]>
     - define groupAmount <[args].get[2].if_null[null]>
     - define command <[args].get[4].if_null[null]>
     - define format <[args].get[3].if_null[null]>
-    - define command <[args].get[4].if_null[null]>
+    - define prefix <[args].get[5].if_null[<empty>]>
 #    - define permission <context.args.get[5].if_null[null]>
     - define permission null
     - define amount 1
@@ -396,11 +467,8 @@ SpikeCodeBulkCodeCreate:
         # Sets the amount how may codes are in the group.
         - flag server redeemableGroups.<[group]>.amount:<[amount]>
         # Creates the specified amount of codes.
-        - while <[loop_index].if_null[1]> <= <[groupAmount]>:
-            - ~webget https://random.justyy.workers.dev/api/random/?n=8&x=6 save:newcode
-            - while <server.has_flag[redeemableCodes.<entry[newcode].result.replace_text[<&dq>]>]>:
-                - ~webget https://random.justyy.workers.dev/api/random/?n=8&x=6 save:newgroup
-            - define code <entry[newcode].result.replace_text[<&dq>]>
+        - while <[loop_index].if_null[1]> <= <[groupAmount].sub[1]>:
+            - define code random
             # Inject Code creation script
             - inject SpikeCodeCreateCode
             - flag server redeemableCodes.<[code]>.group:<[group]>
@@ -415,29 +483,26 @@ SpikeCodeBulkCodeCreate:
         # If so set the permission.
         - else:
             - define msg 'The group "<[group]>" with <[amount]> possible redemption was created!'
-        - run SpikeCodeSendPastebin def:<player>|<[group]>|<server.flag[redeemableGroups.<[group]>.codes].separated_by[]>|<[format]>
-
-
-    # # - Edit
-    # - else if <[setting]> == edit:
-    #     - if !<server.has_flag[redeemableGroups.<[group]>]>:
-    #         - define msg 'The specified group does not exits! To create one use "/redeemsettings create <[group]>"'
-    #         - narrate <[msg]>
-    #         - stop
-    #     - else if !<[amount].is_decimal> && <[amount]> != unlimited:
-    #         - define msg 'You have not specified a correct amount!'
-    #         - narrate <[msg]>
-    #         - stop
-    #     - if <[command]> == null:
-    #         - define command <server.flag[redeemableGroups.<[group]>.commands]>
-    #     - flag server redeemableGroups.<[group]>.commands:<[command].as_list>
-    #     - flag server redeemableGroups.<[group]>.amount:<[amount]>
-    #     - define msg 'The group "<[group]>" with <[amount]> possible redemption was sucessfully edited!'
-    # # - Delete
-    # - else if <[setting]> == delete:
-    #     - if !<server.has_flag[redeemableGroups.<[group]>]>:
-    #         - define msg 'The specified group does not exits! To create one use "/redeemsettings create <[group]>"'
-    #     - else:
-    #         - flag server redeemableGroups.<[group]>:!
-    #         - define msg 'The group "<[group]>" was succesfully deleted!'
+        - run SpikeCodeSendPastebin def:<player>|<[group]>|<server.flag[redeemableGroups.<[group]>.codes].separated_by[<&nl>]>|<[format]>
     - narrate <[msg]>
+
+SpikeCodeRedeemCommandGroup:
+    type: command
+    name: createcommandgroup
+    description: Admin Settings for Spike's redeemable codes.
+    usage: /createcommandgroup  <&dq><&lb><&lt>command1<&gt><&rb><&dq> <&dq><&lb><&lt>command2<&gt><&rb><&dq> ...
+    aliases:
+    - commandgroup
+    permission: spikehidden.admin;spikehidden.coderedeem.admin;spikehidden.coderedeem.codes
+    allowed help:
+    - determine <player.has_permission[spikehidden.admin]>||<context.server>||<player.has_permission[spikehidden.coderedeem.admin]>||<player.has_permission[spikehidden.coderedeem.codes]>
+    tab completions:
+        # Code group
+        default: <server.commands>
+
+    script:
+    - define commands <context.raw_args.split_args>
+    - if <[commands]> == null:
+        - define msg "You didn't provided any arguments."
+    - else:
+        - flag <player> spikehidden.coderedeem.commandgroup:<[commands]>

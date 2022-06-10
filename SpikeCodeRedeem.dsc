@@ -237,7 +237,41 @@ SpikeCodeRedeemAdminCommand:
                 - determine <&lt>argument<&gt>
         # If Edit
         - else if <context.raw_args.split_args.get[1]> == edit:
-            - determine WIP
+            # 2
+            - if <context.raw_args.split_args.size> == 2:
+                - determine code|group
+            # 3..
+            - else if <context.raw_args.split_args.size> >= 3:
+                # if code
+                - if <context.raw_args.split_args.get[2]> == code:
+                    # 3
+                    - if <context.raw_args.split_args.size> == 3:
+                        - determine "<server.flag[redeemableCodes].keys.if_null[No codes found]>"
+                    # 4
+                    - else if <context.raw_args.split_args.size> == 4:
+                        - determine command|amount
+                    # 5
+                    - else if <context.raw_args.split_args.size> == 5:
+                        # If command
+                        - if <context.raw_args.split_args.get[4]> == command:
+                            - determine group|<server.commands>
+                        - else if <context.raw_args.split_args.get[4]> == amount:
+                            - determine 1|10|100|unlimited
+                # if group
+                - else if <context.raw_args.split_args.get[2]> == group:
+                    # 3
+                    - if <context.raw_args.split_args.size> == 3:
+                        - determine "<server.flag[redeemableGroups].keys.if_null[No groups found]>"
+                    # 4
+                    - else if <context.raw_args.split_args.size> == 4:
+                        - determine command|amount
+                    # 5
+                    - else if <context.raw_args.split_args.size> == 5:
+                        # If command
+                        - if <context.raw_args.split_args.get[4]> == command:
+                            - determine group|<server.commands>
+                        - else if <context.raw_args.split_args.get[4]> == amount:
+                            - determine 1|10|100|unlimited
         # If delete
         - else if <context.raw_args.split_args.get[1]> == delete:
             - if <context.raw_args.split_args.size> == 2:
@@ -259,64 +293,143 @@ SpikeCodeRedeemAdminCommand:
     - if <[setting]> == null:
         - narrate "Missing arguments!"
         - stop
-    # - Create
-    - else if <[setting]> == create:
-        # define stuff for the create command
-        - define code <[args].get[2].if_null[null]>
-        - define amount <[args].get[3].if_null[null]>
-        - define command <[args].get[4].to[last].space_separated.if_null[null]>
-        - define permission null
-        # Check if arguments exist
-        - if <[amount]> == null || <[command]> == null:
-            - define msg "Missing arguments!"
-        # Check if amount is decimal or unlimited
-        - else if !<[amount].is_decimal> && <[amount]> != unlimited:
-            - define msg "You specified an invalid ammount of available uses!"
-        # Check if Code already exists
-        - else if <server.has_flag[redeemableCodes.<[code]>]>:
-            - define msg 'The specified code already exists! Please use "/redeemsettings edit <[code]>..." instead!'
-        - else:
-            - inject SpikeCodeCreateCode
 
-    # - Edit
-    # - else if <[setting]> == edit:
-    #     - if !<server.has_flag[redeemableCodes.<[code]>]>:
-    #         - define msg 'The specified Code does not exits! To create one use "/redeemsettings create <[code]>"'
-    #         - narrate <[msg]>
-    #         - stop
-    #     - else if !<[amount].is_decimal> && <[amount]> != unlimited:
-    #         - define msg 'You have not specified a correct amount!'
-    #         - narrate <[msg]>
-    #         - stop
-    #     - if <[command]> == null:
-    #         - define command <server.flag[redeemableCodes.<[code]>.commands]>
-    #     - flag server redeemableCodes.<[code]>.commands:<[command].as_list>
-    #     - flag server redeemableCodes.<[code]>.amount:<[amount]>
-    #     - define msg 'The code "<[code]>" with <[amount]> possible redemption was sucessfully edited!'
+    - else:
+        # Check what type of setting
+        - choose <[setting]>:
 
-    # - Delete
-    - else if <[setting]> == delete:
-        # Define stuff
-        - define type <[args].get[2]>
-        - define name <[args].get[3]>
-        # If code
-        - if <[type]> == code:
-            - if <server.has_flag[redeemableCodes.<[name]>]>:
-                - flag server redeemableCodes.<[name]>:!
-                - define msg 'The code "<[name]>" was succesfully deleted!'
-            - else:
-                - define msg 'The specified Code does not exits! To create it use "/redeemsettings create <[code]>..."'
-        # If group
-        - if <[type]> == group:
-            - if <server.has_flag[redeemableGroups.<[name]>]>:
-                - define codeCount 0
-                - foreach <server.flag[redeemableGroups.<[name]>.codes]> as:code:
-                    - flag server redeemableCodes.<[code]>:!
-                    - define codeCount:++
-                - flag server redeemableGroups.<[name]>:!
-                - define msg "The code group <&dq><[name]><&dq> with <[codeCount]> code/s was succesfully deleted."
-            - else:
-                - define msg 'The specified group does not exits!"'
+            # - Create
+            - case create:
+                # define stuff for the create command
+                - define code <[args].get[2].if_null[null]>
+                - define amount <[args].get[3].if_null[null]>
+                - define command <[args].get[4].to[last].space_separated.if_null[null]>
+                - define permission null
+                # Check if arguments exist
+                - if <[amount]> == null || <[command]> == null:
+                    - define msg "Missing arguments!"
+                # Check if amount is decimal or unlimited
+                - else if !<[amount].is_decimal> && <[amount]> != unlimited:
+                    - define msg "You specified an invalid ammount of available uses!"
+                # Check if Code already exists
+                - else if <server.has_flag[redeemableCodes.<[code]>]>:
+                    - define msg 'The specified code already exists! Please use "/redeemsettings edit <[code]>..." instead!'
+                - else:
+                    - inject SpikeCodeCreateCode
+
+            # - Edit
+            - case edit:
+                - if !<[args].get[2].exists> || !<[args].get[3].exists> || !<[args].get[4].exists> || !<[args].get[5].exists>:
+                    - define msg "Missing arguments."
+                - else:
+                    # defining stuff
+                    - define type <[args].get[2]>
+                    - define name <[args].get[3]>
+                    - define edit <[args].get[4]>
+                    - define value <[args].get[5]>
+                    # Code or Group
+                    - choose <[type]>:
+
+                        # If Code
+                        - case code:
+                            # Check if the code exists
+                            - if <server.has_flag[redeemableCodes.<[name]>]>:
+                                # Check what shall be edited.
+                                - choose <[edit]>:
+                                    # If command
+                                    - case command:
+                                        # Check if command group shall be used.
+                                        - choose <[value]>:
+                                            # If group
+                                            - case group:
+                                                - flag server redeemableCodes.<[name]>.commands:<player.flag[spikehidden.coderedeem.commandgroup]>
+                                                - define msg "Commands were succesfully added to the code <&dq><[name]><&dq>."
+                                            # If not
+                                            - default:
+                                                - flag server redeemableCodes.<[name]>.commands:<[value]>
+                                                - define msg "Command was succesfully added to the code <&dq><[name]><&dq>."
+                                    # If amount
+                                    - case amount:
+                                        # Check if amount is valid
+                                        - if <[value].is_decimal> || <[value]> == unlimited:
+                                            - flag server redeemableCodes.<[name]>:<[value]>
+                                            - define msg "Amount of the code <&dq><[name]><&dq> was succesfully changed to <[value]>."
+                                        # Show error if invalid amount is specified.
+                                        - else:
+                                            - define msg "Invalid amount specified!"
+                                    - default:
+                                        - define msg "You can only edit the amount or commands of a code. For anything else delete and recreate the code."
+                            # Show error if it doesn't
+                            - else:
+                                - define msg "The code <&dq><[name]><&dq> does not exist."
+
+                        # If Group
+                        - case group:
+                            - if <server.has_flag[redeemableGroups.<[name]>]>:
+                                # Check what shall be edited.
+                                - choose <[edit]>:
+                                    # If command
+                                    - case command:
+                                        # Check if command group shall be used.
+                                        - choose <[value]>:
+                                            # If group
+                                            - case group:
+                                                - define loopCount 0
+                                                - foreach <server.flag[redeemableGroups.<[name]>.codes]> as:code:
+                                                    - flag server redeemableCodes.<[code]>.commands:<player.flag[spikehidden.coderedeem.commandgroup]>
+                                                    - define loopCount:++
+                                                - define msg "Commands were succesfully added to <[loopCount]> codes of group <&dq><[name]><&dq>."
+                                            # If not
+                                            - default:
+                                                - define loopCount 0
+                                                - foreach <server.flag[redeemableGroups.<[name]>.codes]> as:code:
+                                                    - flag server redeemableCodes.<[code]>.commands:<[value]>
+                                                    - define loopCount:++
+                                                - define msg "Command were succesfully added to <[loopCount]> codes of group <&dq><[name]><&dq>."
+                                    # If amount
+                                    - case amount:
+                                        # Check if amount is valid
+                                        - if <[value].is_decimal> || <[value]> == unlimited:
+                                            - define loopCount 0
+                                            - foreach <server.flag[redeemableGroups.<[name]>.codes]> as:code:
+                                                - flag server redeemableCodes.<[code]>.amount:<[value]>
+                                                - define loopCount:++
+                                            - define msg "Amount was succesfully updated to <[value]> for <[loopCount]> codes of group <&dq><[name]><&dq>."
+                                        # Show error if invalid amount is specified.
+                                        - else:
+                                            - define msg "Invalid amount specified!"
+                                    # If invalid argument
+                                    - default:
+                                        - define msg "You can only edit the amount or commands of a group. For anything else delete and recreate the group."
+                            - else:
+                                - define msg "The group <&dq><[name]><&dq> does not exist."
+
+                        # Invalid Argument
+                        - default:
+                            - define msg "Invalid arguments!"
+            # - Delete
+            - case delete:
+                # Define stuff
+                - define type <[args].get[2]>
+                - define name <[args].get[3]>
+                # If code
+                - if <[type]> == code:
+                    - if <server.has_flag[redeemableCodes.<[name]>]>:
+                        - flag server redeemableCodes.<[name]>:!
+                        - define msg 'The code "<[name]>" was succesfully deleted!'
+                    - else:
+                        - define msg 'The specified Code does not exits! To create it use "/redeemsettings create <[code]>..."'
+                # If group
+                - if <[type]> == group:
+                    - if <server.has_flag[redeemableGroups.<[name]>]>:
+                        - define codeCount 0
+                        - foreach <server.flag[redeemableGroups.<[name]>.codes]> as:code:
+                            - flag server redeemableCodes.<[code]>:!
+                            - define codeCount:++
+                        - flag server redeemableGroups.<[name]>:!
+                        - define msg "The code group <&dq><[name]><&dq> with <[codeCount]> code/s was succesfully deleted."
+                    - else:
+                        - define msg 'The specified group does not exits!"'
     - narrate <[msg]>
 
 # + Command for redeeming codes.
@@ -342,10 +455,13 @@ spikeCodeRedeemCommand:
         - narrate 'This command can only be executed by a player!'
         - stop
     # Define stuf!! STUFF!!
-    - define code <context.args.get[1]>
+    - define code <context.args.get[1].if_null[null]>
     - define log <script[SpikeCodeRedeemData].data_key[redemptionLog]>
     - define logPath <script[SpikeCodeRedeemData].data_key[logPath]>CodeRedemption_<util.time_now.format[yyyy-MM-dd]>.log
     # Check if the code exists!
+    - if <[code]> == null:
+        - narrate "You have not specified any code."
+        - stop
     - if <server.has_flag[redeemableCodes.<[code]>]>:
         # Define more stuff!
         - define commands <server.flag[redeemableCodes.<[code]>.commands]>
@@ -368,12 +484,12 @@ spikeCodeRedeemCommand:
     - else:
         - define msg 'The specified code "<[code]>" does not exist!'
     # Check if the Player can redeem the code
-    - if <[mayRedeem]>:
+    - if <[mayRedeem].if_null[false]>:
         # Check if player not already used the code.
         - if not <server.flag[redeemableCodes.<[code]>.usedBy].contains_any[<player>].if_null[false]>:
             # If so execute the saved commands.
             - foreach <[commands]> as:cmd:
-                - define command <[cmd].replace_text[$(player)].with[<player.name>]>
+                - define command <[cmd].replace_text[<&lt>p<&gt>].with[<player.name>]>
                 - execute as_server <[command]>
             # Log execution of each command if it's enabled in the settings.
                 - if <[log]>:

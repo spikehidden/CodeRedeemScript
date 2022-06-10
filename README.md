@@ -3,7 +3,7 @@
 ## Configs
 
 ### __**Default Config**__
-```dsc
+```yaml
 # + Config +
 SpikeCodeRedeemData:
     type: data

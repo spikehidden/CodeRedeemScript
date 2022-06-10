@@ -16,6 +16,8 @@
 # - You should have received a copy of the GNU Affero General Public License
 # - along with this program.  If not, see https://spikey.biz/karga.
 
+# + License End +
+
 # +---------------------------------+
 # |                                 |
 # | Redeemable Codes                |
@@ -25,16 +27,16 @@
 # |                                 |
 # +---------------------------------+
 #
-# @Spikehidden
-# @date 2022/MM/dd
-# @denizen-build version
-# @script-version 0.1-ALPHA
+# @author Spikehidden
+# @date 2022/06/10
+# @denizen-build 1.2.4-SNAPSHOT (build 1766-REL)
+# @script-version 1.0
 #
 # + REQUIREMENTS +
-# - List of required Plugins
+# - None
 #
 # + Required or recommended for some features +
-# - List of required Plugins for optional features
+# - A Pastebin Account + DevKey if you want to use that feature.
 #
 # + CONTACT +
 #
@@ -54,16 +56,11 @@ SpikeCodeRedeemData:
     # ------ Pastebin ------
     # Do you want to use private or public pastes on Pastebin.com ?
     # You can find more info in the readme at https://github.com/spikehidden/CodeRedeemScript
-    # Default is true as it is recommended to use this feature when bulk creating codes!
-    UsePastebin: true
+    # Default is false as it is not recommended to use this feature when bulk creating codes!
+    UsePastebin: false
     # Put your pastebin devKey in here as it's not possible to retrieve it from the "secrets.secret" file at the moment.
     # As soon as it is possible we'll do it that way.
-    devKey: pyUudImyS3eAEAy5DcVmbMzAh3S7CJMH
-
-    # If it is a public or unlisted paste you don't need to have a user key nor a dev key.
-    # But it will ONLY allow the use of md5 hashes as public pastes can be viewed by anyone.
-    ## NOT RECOMMEND TO USE PUBLIC PASTES AS EVERYONE COULD SEE THE CODES EVEN THOUGH THEY ARE ENCRYPTED!
-    IsPublic: false
+    devKey: Put Your Key Here!
 
     # ------ Debug & Log ------
     # Shall redemption be logged?
@@ -87,8 +84,8 @@ SpikeCodeRedeemUpdate:
     Github:
         profile: Spikehidden
         respository: CodeRedeemScript
-        filename: XXX
-    version: XXX
+        filename: SpikeCodeRedeem.dsc
+    version: 1.0
 
 # ++++++ Tasks ++++++
 # + Create Code Task +
@@ -152,6 +149,18 @@ SpikeCodeSendPastebin:
     - else:
         - narrate 'You have disabled the use of Pastebin! So you will not be able to get a list of all codes! Please enable it and get a Pastebin dev key!'
         - narrate 'Run "/getlist <&lb><&lt>code group ID<&gt><&rb> (<&lt>format<&gt>)" to get the List of codes!'
+
+SpikeCodeRedeemCreateList:
+    type: task
+    definitions: player|paste_name|paste_content|format|paste_format
+    script:
+    - choose <[format]>:
+        - case list:
+            - ~log <[paste_content]> type:none file:plugins/denizen/spikehidden/code_redeem/codes/<[paste_name]>.txt
+        - case wizebot:
+            - ~log <[paste_content]> type:none file:plugins/denizen/spikehidden/code_redeem/codes/<[paste_name]>.csv
+        - default:
+            - ~log <[paste_content]> type:none file:plugins/denizen/spikehidden/code_redeem/codes/<[paste_name]>.txt
 
 # ++++++ World ++++++
 SpikeCodeRedeemSystem:
@@ -531,7 +540,7 @@ SpikeCodeRedeemBulkCreate:
     - determine <player.has_permission[spikehidden.admin]>||<context.server>||<player.has_permission[spikehidden.coderedeem.admin]>||<player.has_permission[spikehidden.coderedeem.codes]>
     tab completions:
         # Code group
-        1: <server.flag[redeemableCodeGroups].as_list.if_null[<&lt>Code Group Name<&gt>]>
+        1: <&lt>Code_Group_Name<&gt>
         # amount of codes
         2: 1|2|3|4|5|10|100|1000
         # format
@@ -553,6 +562,7 @@ SpikeCodeRedeemBulkCreate:
     - define command <[args].get[4].if_null[null]>
     - define format <[args].get[3].if_null[null]>
     - define prefix <[args].get[5].if_null[<empty>]>
+    - define UsePastebin <script[SpikeCodeRedeemData].data_key[UsePastebin].if_null[false]>
 #    - define permission <context.args.get[5].if_null[null]>
     - define permission null
     - define amount 1
@@ -599,7 +609,28 @@ SpikeCodeRedeemBulkCreate:
         # If so set the permission.
         - else:
             - define msg 'The group "<[group]>" with <[amount]> possible redemption was created!'
-        - run SpikeCodeSendPastebin def:<player>|<[group]>|<server.flag[redeemableGroups.<[group]>.codes].separated_by[<&nl>]>|<[format]>
+        - if <[UsePastebin]>:
+            - choose <[format]>:
+                - case list:
+                    - run SpikeCodeSendPastebin def:<player>|<[group]>|<server.flag[redeemableGroups.<[group]>.codes].separated_by[<&nl>]>|<[format]>
+                - case wizebot:
+                    - define csv "<list[Your Information;Your description;Extra]>"
+                    - foreach <server.flag[redeemableGroups.<[group]>.codes]> as:data:
+                        - define "csv:->:<[data]>;Use the code together with <&dq>/redeem<&dq> on the Minecraft Server.;<empty>"
+                    - run SpikeCodeSendPastebin def:<player>|<[group]>|<[csv].separated_by[<&nl>]>|<[format]>
+                - default:
+                    - run SpikeCodeSendPastebin def:<player>|<[group]>|<server.flag[redeemableGroups.<[group]>.codes].separated_by[<&nl>]>|list
+        - else:
+            - choose <[format]>:
+                - case list:
+                    - run SpikeCodeRedeemCreateList def:<player>|<[group]>|<server.flag[redeemableGroups.<[group]>.codes].separated_by[<&nl>]>|<[format]>
+                - case wizebot:
+                    - define csv "<list[Your Information;Your description;Extra]>"
+                    - foreach <server.flag[redeemableGroups.<[group]>.codes]> as:data:
+                        - define "csv:->:<[data]>;Use the code together with <&dq>/redeem<&dq> on the Minecraft Server.;<empty>"
+                    - run SpikeCodeRedeemCreateList def:<player>|<[group]>|<[csv].separated_by[<&nl>]>|<[format]>
+                - default:
+                    - run SpikeCodeRedeemCreateList def:<player>|<[group]>|<server.flag[redeemableGroups.<[group]>.codes].separated_by[<&nl>]>|list
     - narrate <[msg]>
 
 SpikeCodeRedeemCommandGroup:

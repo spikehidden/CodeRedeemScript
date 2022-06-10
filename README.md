@@ -47,3 +47,11 @@ Beware that the start of the path is your Sever's base directory and not the Den
 ### Advanced Settings
 You shouldn't have to edit any of this at all and if you do I will not provide any support.  
 Though you might have to edit it if Pastebin changes their API endpoints but in this case I will update the script.
+
+## Twitch/YouTube Bot Support
+Currently we are supporting export formats for easier import of codelists for the following Bots/Softwares:
+| Bot                           | Premium available | Premium needed for import? |
+| :---------------------------- | :---------------: | :------------------------: |
+| [Wizebot](https://wizebot.tv) | yes               | yes                        |
+
+If you want me to support more bots/software then just open an issue to request it and I happily will if possible.

@@ -2,7 +2,7 @@
 [![License](https://img.shields.io/badge/License-CC--BY--SA--4.0-blue)](#LICENSE)
 [![issues - CodeRedeemScript](https://img.shields.io/github/issues/Spikehidden/CodeRedeemScript)](https://github.com/Spikehidden/CodeRedeemScript/issues)
 
-[![Discord - Support](https://img.shields.io/badge/Discord-Support-5865F2?logo=Discord&logoColor=white)](https://spikey.biz/kofi)
+[![Discord - Support](https://img.shields.io/badge/Discord-Support-5865F2?logo=Discord&logoColor=white)](https://spikey.biz/discord)
 [![Ko-Fi - Donate](https://img.shields.io/badge/Ko--Fi-Donate-FF5E5B?logo=Ko-Fi&logoColor=white)](https://spikey.biz/kofi)
 [![Twitch - Subscribe](https://img.shields.io/badge/Twitch-Subscribe-9146FF?logo=Twitch&logoColor=white)](https://spikey.biz/twitch)
 

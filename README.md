@@ -1,3 +1,7 @@
+[![GitHub release](https://img.shields.io/github/release/Spikehidden/CodeRedeemScript?include_prereleases=&sort=semver&color=blue)](https://github.com/Spikehidden/CodeRedeemScript/releases/)
+[![License](https://img.shields.io/badge/License-CC--BY--SA--4.0-blue)](#license)
+[![issues - CodeRedeemScript](https://img.shields.io/github/issues/Spikehidden/CodeRedeemScript)](https://github.com/Spikehidden/CodeRedeemScript/issues)
+
 # Spikehidden's Code Redeem Script
  A Denizen Script do create redeemable codes with pastebin support.
 ## Configs

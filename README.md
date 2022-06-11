@@ -1,6 +1,10 @@
 [![GitHub release](https://img.shields.io/github/release/Spikehidden/CodeRedeemScript?include_prereleases=&sort=semver&color=blue)](https://github.com/Spikehidden/CodeRedeemScript/releases/)
-[![License](https://img.shields.io/badge/License-CC--BY--SA--4.0-blue)](#license)
+[![License](https://img.shields.io/badge/License-CC--BY--SA--4.0-blue)](#LICENSE)
 [![issues - CodeRedeemScript](https://img.shields.io/github/issues/Spikehidden/CodeRedeemScript)](https://github.com/Spikehidden/CodeRedeemScript/issues)
+
+[![Discord - Support](https://img.shields.io/badge/Discord-Support-5865F2?logo=Discord&logoColor=white)](https://spikey.biz/kofi)
+[![Ko-Fi - Donate](https://img.shields.io/badge/Ko--Fi-Donate-FF5E5B?logo=Ko-Fi&logoColor=white)](https://spikey.biz/kofi)
+[![Twitch - Subscribe](https://img.shields.io/badge/Twitch-Subscribe-9146FF?logo=Twitch&logoColor=white)](https://spikey.biz/twitch)
 
 # Spikehidden's Code Redeem Script
  A Denizen Script do create redeemable codes with pastebin support.
@@ -59,3 +63,7 @@ Currently we are supporting export formats for easier import of codelists for th
 | [Wizebot](https://wizebot.tv) | yes               | yes                        |
 
 If you want me to support more bots/software then just open an issue to request it and I happily will if possible.
+
+## License
+
+Released under [CC-BY-SA-4.0](/LICENSE.md) by [@Spikehidden](https://github.com/Spikehidden).

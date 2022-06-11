@@ -99,6 +99,7 @@ SpikeCodeRedeemUpdate:
 # + Create Code Task +
 SpikeCodeCreateCode:
     type: task
+    debug: false
     definitions: code|amount|command|permission|prefix
 
     script:
@@ -128,6 +129,7 @@ SpikeCodeCreateCode:
 # + Send Code List to Pastebin +
 SpikeCodeSendPastebin:
     type: task
+    debug: false
     definitions: player|paste_name|paste_content|format|paste_format
 
     script:
@@ -160,6 +162,7 @@ SpikeCodeSendPastebin:
 
 SpikeCodeRedeemCreateList:
     type: task
+    debug: false
     definitions: player|paste_name|paste_content|format|paste_format
     script:
     - choose <[format]>:
@@ -173,6 +176,7 @@ SpikeCodeRedeemCreateList:
 # ++++++ World ++++++
 SpikeCodeRedeemSystem:
     type: world
+    debug: false
     events:
         on server start:
             - announce "<&ss>9[SpikeCodeRedeem]<&ss>r Script loaded." to_console
@@ -188,6 +192,7 @@ SpikeCodeRedeemSystem:
 # + Command to get Pastebin Userkey +
 SpikeCodeRedeemPastebinCommand:
     type: command
+    debug: false
     name: pastebin
     description: Generate your Pastebin Userkey
     usage: /pastebin <&lb><&lt>username<&gt><&rb> <&lb><&lt>password<&gt><&rb>
@@ -226,6 +231,7 @@ SpikeCodeRedeemPastebinCommand:
 # + Command for creating, deleting and editing codes +
 SpikeCodeRedeemAdminCommand:
     type: command
+    debug: false
     name: redeemsettings
     description: Admin Settings for Spike's redeemable codes.
     usage: /redeemsettings <&lb>create/edit/delete<&rb> <&lb><&lt>code<&gt>/random<&rb> <&lb><&lt>amount of uses<&gt>/unlimited<&rb> <&lb><&lt>command<&gt>/group:<&lt>command group<&gt><&rb> (<&lt>permission<&gt>)
@@ -452,7 +458,7 @@ SpikeCodeRedeemAdminCommand:
 # + Command for redeeming codes.
 spikeCodeRedeemCommand:
     type: command
-    debug: true
+    debug: false
     name: redeem
     description: Command to redeem codes
     usage: /redeem <&lb><&lt>code<&gt><&rb>
@@ -538,6 +544,7 @@ spikeCodeRedeemCommand:
 # + Command for bulk creating codes +
 SpikeCodeRedeemBulkCreate:
     type: command
+    debug: false
     name: bulkcodecreate
     description: Admin Settings for Spike's redeemable codes.
     usage: /bulkcodecreate  <&lb><&lt>code group name<&gt><&rb> <&lb><&lt>amount of codes<&gt><&rb> <&lb><&lt>command<&gt>/group<&lt>command group<&gt><&rb> (<&lt>format for list export<&gt>) (<&lt>permission<&gt>)
@@ -643,6 +650,7 @@ SpikeCodeRedeemBulkCreate:
 
 SpikeCodeRedeemCommandGroup:
     type: command
+    debug: false
     name: createcommandgroup
     description: Admin Settings for Spike's redeemable codes.
     usage: /createcommandgroup  <&dq><&lb><&lt>command1<&gt><&rb><&dq> <&dq><&lb><&lt>command2<&gt><&rb><&dq> ...

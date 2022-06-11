@@ -65,15 +65,15 @@ Currently we are supporting export formats for easier import of codelists for th
 If you want me to support more bots/software then just open an issue to request it and I happily will if possible.
 
 ## Commands
-| Command                  | arguments                                                    | Feature                    | Permissions |
-| :----------------------- | :----------------------------------------------------------- | :------------------------- | :---------- |
-| redeemadmin create       | (\<code\>/random) \<amount\> (\<command\>/group)             |                            |             |
-| redeemadmin edit         | (code/group) \<name\> (amount/command) \<new value\>         |                            |             |
-| redeemadmin delete       | (code/group) \<name\>                                        |                            |             |
-| redeem                   | \<code\>                                                     |                            |             |
-| bulkcreate               | (\<groupName\>/random) \<amountOfCodes\> (\<command\>/group) |                            |             |
-| pastebin                 | \<username\> \<password\>                                    |                            |             |
-| commandgroup             | "\<command1\>" "\<command2\>" (...)                          |                            |             |
+| Command                  | arguments                                                    | Feature                             | Permissions                                                                      |
+| :----------------------- | :----------------------------------------------------------- | :---------------------------------- | :------------------------------------------------------------------------------- |
+| redeemadmin create       | (\<code\>/random) \<amount\> (\<command\>/group)             |  Create a new code                  | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.codes    |
+| redeemadmin edit         | (code/group) \<name\> (amount/command) \<new value\>         |  Edit a code or group               | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.codes    |
+| redeemadmin delete       | (code/group) \<name\>                                        |  Delete a code or group             | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.codes    |
+| redeem                   | \<code\>                                                     |  Redeem a code                      | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.redeem   |
+| bulkcreate               | (\<groupName\>/random) \<amountOfCodes\> (\<command\>/group) |  Create a bunch of codes (group)    | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.codes    |
+| pastebin                 | \<username\> \<password\>                                    |  Get and save your pastebin userkey | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.pastebin |
+| commandgroup             | "\<command1\>" "\<command2\>" (...)                          |  Creates a temporary command group  | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.codes    |
 
 
 ## License

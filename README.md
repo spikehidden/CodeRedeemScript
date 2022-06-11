@@ -37,14 +37,14 @@ SpikeCodeRedeemData:
         login: api_login.php
         paste: api_post.php
 ```
-### Pastebin
+### **Pastebin**
 #### UsePastebin
 Set this to true if you want to export code lists to Pastebin but don't forget to input your devkey in the next point.
 
 #### devKey
 Put here your dev key which you can find on [Pastebin API documentation](https://pastebin.com/doc_api)
 
-### Debug & Log
+### **Debug & Log**
 #### redemptionLog
 Set this to `false` if you want to disable logging redemptions.
 
@@ -52,7 +52,7 @@ Set this to `false` if you want to disable logging redemptions.
 Set this to where the log should be saved.
 Beware that the start of the path is your Sever's base directory and not the Denizen folder.
 
-### Advanced Settings
+### **Advanced Settings**
 You shouldn't have to edit any of this at all and if you do I will not provide any support.  
 Though you might have to edit it if Pastebin changes their API endpoints but in this case I will update the script.
 

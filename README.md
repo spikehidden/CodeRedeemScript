@@ -8,7 +8,7 @@
 
 # Spikehidden's Code Redeem Script
  A Denizen Script do create redeemable codes with pastebin support.
-## Configs
+## Config
 
 ### __**Default Config**__
 ```yaml
@@ -63,6 +63,8 @@ Currently we are supporting export formats for easier import of codelists for th
 | [Wizebot](https://wizebot.tv) | yes               | yes                        |
 
 If you want me to support more bots/software then just open an issue to request it and I happily will if possible.
+
+## Commands
 
 ## License
 

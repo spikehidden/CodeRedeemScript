@@ -3,7 +3,7 @@ name: New List output format
 about: Request a new export format for the code list
 title: ''
 labels: ''
-assignees: ''
+assignees: spikehidden
 
 ---
 

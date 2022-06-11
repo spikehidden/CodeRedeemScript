@@ -1,10 +1,13 @@
 [![GitHub release](https://img.shields.io/github/release/Spikehidden/CodeRedeemScript?include_prereleases=&sort=semver&color=blue)](https://github.com/Spikehidden/CodeRedeemScript/releases/)
-[![License](https://img.shields.io/badge/License-CC--BY--SA--4.0-blue)](#LICENSE)
+[![License](https://img.shields.io/github/license/Spikehidden/CodeRedeemScript?logo=Creative%20commons)](#LICENSE)
 [![issues - CodeRedeemScript](https://img.shields.io/github/issues/Spikehidden/CodeRedeemScript)](https://github.com/Spikehidden/CodeRedeemScript/issues)
 
-[![Support Server](https://img.shields.io/discord/731894292557201529.svg?color=online&label=Discord&logo=discord&style=flat-square)](https://spikey.biz/discord)
+[![Discord](https://img.shields.io/discord/731894292557201529?label=Discord&logo=Discord)](https://spikey.biz/discord)
 [![Ko-Fi - Donate](https://img.shields.io/badge/Ko--Fi-Donate-FF5E5B?logo=Ko-Fi&logoColor=white)](https://spikey.biz/kofi)
 [![Twitch - Subscribe](https://img.shields.io/badge/Twitch-Subscribe-9146FF?logo=Twitch&logoColor=white)](https://spikey.biz/twitch)
+
+[![Spiget Stars](https://img.shields.io/spiget/stars/102540?label=spigotmc.org&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8%2F9hAAAAmklEQVQ4jaVTORKAIAzcOD6CRt9AbWPHv%2F2Bb9CGX8RGHCQHzrgVQ5LdTQgECVbuWpA4GKjJ1NyhJ8W7H%2FcI2lbU1lwHRd1z0W0BAM6wmjFtMFyr1sVz2ETNCKU3rXjK20ugEI29KWvEAEARDICodWCpU5TDpGjM4Miy%2BLbMjQtzE7U3L7kPiUfg4ctf8bGkzEvKDHxcJA%2B%2FCS5YrDUokhVf1AAAAABJRU5ErkJggg%3D%3D&style=flat)](https://www.spigotmc.org/resources/102540/)
+[![GitHub all releases](https://img.shields.io/github/downloads/Spikehidden/CodeRedeemScript/total?logo=github&style=flat)](https://github.com/spikehidden/CodeRedeemScript/releases/latest)
 
 # Spikehidden's Code Redeem Script
  A Denizen Script do create redeemable codes with pastebin support.

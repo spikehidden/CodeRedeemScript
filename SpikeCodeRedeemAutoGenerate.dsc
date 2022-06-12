@@ -58,12 +58,33 @@
 # - Twitch:     https://spikey.biz/twitch
 # - Ko-Fi:      https://spikey.biz/kofi
 
+# =========== DO NOT EDIT ANYTHING BELOW THIS LINE IF YOU DON'T KNOW WHAT YOU'RE DOING! ===========
+
+# ++++++ Data for Updater Scripts ++++++
+# This is in advance for a future project of mine.
+SpikeCodeRedeemAutoUpdate:
+    type: data
+
+    github:
+        profile: Spikehidden
+        respository: CodeRedeemScript
+        files:
+        - SpikeCodeRedeemAutoGenerate.dsc
+        version: 1.2
+        prerelease: false
+
 # ++++++ World ++++++
 SpikeCodeRedeemAutoEvents:
     type: world
     debug: false
     events:
         #- Check if core script is loaded
+        on server start:
+            - if <server.has_flag[SpikehiddenUpdater]>:
+                - announce "<&ss>9[SpikeCodeRedeem]<&ss>r Spikehidden's Auto Updater has been found!" to_console
+                - flag server SpikeCodeRedeemAutoUpdate:github
+                - flag server SpikehiddenUpdater.data:->:SpikeCodeRedeemAutoUpdate
+                - announce "<&ss>9[SpikeCodeRedeem]<&ss>r Providing Update data of Auto Generate Addon for Spikehidden's Auto Updater" to_console
         after server start:
             - if <server.has_flag[SpikeCodeRedeem]>:
                 - flag server SpikeCodeRedeem.addon.autogenerate

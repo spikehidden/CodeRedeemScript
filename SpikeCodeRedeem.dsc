@@ -61,14 +61,18 @@
 # =========== DO NOT EDIT ANYTHING BELOW THIS LINE IF YOU DON'T KNOW WHAT YOU'RE DOING! ===========
 
 # ++++++ Data for Updater Scripts ++++++
+# This is in advance for a future project of mine.
 SpikeCodeRedeemUpdate:
     type: data
 
-    Github:
+    github:
         profile: Spikehidden
         respository: CodeRedeemScript
-        filename: SpikeCodeRedeem.dsc
-    version: 1.0
+        files:
+        - SpikeCodeRedeem.dsc
+        - SpikeCodeRedeem-Config.dsc
+        version: 1.2
+        prerelease: false
 
 # ++++++ Tasks ++++++
 # + Create Code Task +
@@ -158,7 +162,8 @@ SpikeCodeRedeemSystem:
             - flag server SpikeCodeRedeem
             - if <server.has_flag[SpikehiddenUpdater]>:
                 - announce "<&ss>9[SpikeCodeRedeem]<&ss>r Spikehidden's Auto Updater has been found!" to_console
-                - flag server SpikehiddenUpdater.data:->:SpikeCodeRedeem.update
+                - flag server SpikeCodeRedeemUpdate:github
+                - flag server SpikehiddenUpdater.data:->:SpikeCodeRedeemUpdate
                 - announce "<&ss>9[SpikeCodeRedeem]<&ss>r Providing Update data for the Spikehidden's Auto Updater" to_console
         on shutdown:
             - flag server SpikeCodeRedeem:!

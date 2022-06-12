@@ -58,31 +58,6 @@
 # - Twitch:     https://spikey.biz/twitch
 # - Ko-Fi:      https://spikey.biz/kofi
 
-# + Config +
-SpikeCodeRedeemData:
-    type: data
-    # ------ Pastebin ------
-    # Do you want to use private or public pastes on Pastebin.com ?
-    # You can find more info in the readme at https://github.com/spikehidden/CodeRedeemScript
-    # Default is false as it is not recommended to use this feature when bulk creating codes!
-    UsePastebin: false
-    # Put your pastebin devKey in here as it's not possible to retrieve it from the "secrets.secret" file at the moment.
-    # As soon as it is possible we'll do it that way.
-    devKey: Put Your Key Here!
-
-    # ------ Debug & Log ------
-    # Shall redemption be logged?
-    redemptionLog: true
-    logPath: spikehidden/logs/
-
-    # ------ Advanced Settings ------
-    # Don't change this unless Pastebin changed their API endpoints
-    API:
-        endpoint: pastebin.com/api/
-        data: api_raw.php
-        login: api_login.php
-        paste: api_post.php
-
 # =========== DO NOT EDIT ANYTHING BELOW THIS LINE IF YOU DON'T KNOW WHAT YOU'RE DOING! ===========
 
 # ++++++ Data for Updater Scripts ++++++

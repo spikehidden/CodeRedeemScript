@@ -1,14 +1,18 @@
 [![GitHub release](https://img.shields.io/github/release/Spikehidden/CodeRedeemScript?include_prereleases=&sort=semver&color=blue)](https://github.com/Spikehidden/CodeRedeemScript/releases/)
-[![License](https://img.shields.io/badge/License-CC--BY--SA--4.0-blue)](#LICENSE)
+[![License](https://img.shields.io/github/license/Spikehidden/CodeRedeemScript?logo=Creative%20commons)](#LICENSE)
 [![issues - CodeRedeemScript](https://img.shields.io/github/issues/Spikehidden/CodeRedeemScript)](https://github.com/Spikehidden/CodeRedeemScript/issues)
 
-[![Discord - Support](https://img.shields.io/badge/Discord-Support-5865F2?logo=Discord&logoColor=white)](https://spikey.biz/discord)
+[![Discord](https://img.shields.io/discord/731894292557201529?label=Discord&logo=Discord)](https://spikey.biz/discord)
 [![Ko-Fi - Donate](https://img.shields.io/badge/Ko--Fi-Donate-FF5E5B?logo=Ko-Fi&logoColor=white)](https://spikey.biz/kofi)
 [![Twitch - Subscribe](https://img.shields.io/badge/Twitch-Subscribe-9146FF?logo=Twitch&logoColor=white)](https://spikey.biz/twitch)
 
+[![Spiget Stars](https://img.shields.io/spiget/stars/102540?label=spigotmc.org&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8%2F9hAAAAmklEQVQ4jaVTORKAIAzcOD6CRt9AbWPHv%2F2Bb9CGX8RGHCQHzrgVQ5LdTQgECVbuWpA4GKjJ1NyhJ8W7H%2FcI2lbU1lwHRd1z0W0BAM6wmjFtMFyr1sVz2ETNCKU3rXjK20ugEI29KWvEAEARDICodWCpU5TDpGjM4Miy%2BLbMjQtzE7U3L7kPiUfg4ctf8bGkzEvKDHxcJA%2B%2FCS5YrDUokhVf1AAAAABJRU5ErkJggg%3D%3D&style=flat)](https://www.spigotmc.org/resources/102540/)
+[![GitHub all releases](https://img.shields.io/github/downloads/Spikehidden/CodeRedeemScript/total?logo=github&style=flat)](https://github.com/spikehidden/CodeRedeemScript/releases/latest)
+[![GitHub stars](https://img.shields.io/github/stars/spikehidden/CodeRedeemScript)](https://github.com/spikehidden/CodeRedeemScript/stargazers)
+
 # Spikehidden's Code Redeem Script
  A Denizen Script do create redeemable codes with pastebin support.
-## Configs
+## Config
 
 ### __**Default Config**__
 ```yaml
@@ -63,6 +67,23 @@ Currently we are supporting export formats for easier import of codelists for th
 | [Wizebot](https://wizebot.tv) | yes               | yes                        |
 
 If you want me to support more bots/software then just open an issue to request it and I happily will if possible.
+
+## Commands & Permissions
+### Core Script
+| Command                  | arguments                                                    | Feature                             | Permissions                                                                      |
+| :----------------------- | :----------------------------------------------------------- | :---------------------------------- | :------------------------------------------------------------------------------- |
+| redeemadmin create       | (\<code\>/random) \<amount\> (\<command\>/group)             |  Create a new code                  | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.codes    |
+| redeemadmin edit         | (code/group) \<name\> (amount/command) \<new value\>         |  Edit a code or group               | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.codes    |
+| redeemadmin delete       | (code/group) \<name\>                                        |  Delete a code or group             | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.codes    |
+| redeem                   | \<code\>                                                     |  Redeem a code                      | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.redeem   |
+| bulkcreate               | (\<groupName\>/random) \<amountOfCodes\> (\<command\>/group) |  Create a bunch of codes (group)    | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.codes    |
+| pastebin                 | \<username\> \<password\>                                    |  Get and save your pastebin userkey | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.pastebin |
+| commandgroup             | "\<command1\>" "\<command2\>" (...)                          |  Creates a temporary command group  | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.codes    |
+
+### Auto Generate Code AddOn
+| Command      | arguments | Feature                                   | Permissions                     |
+| :----------- | :-------- | :---------------------------------------- | :------------------------------ |
+| (No command) |           | Permission to get generated code on join. | spikehidden.coderedeem.autocode |
 
 ## License
 

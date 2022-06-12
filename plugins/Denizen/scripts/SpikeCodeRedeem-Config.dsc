@@ -61,6 +61,7 @@
 # ++++++ Config ++++++
 SpikeCodeRedeemData:
     type: data
+    # + Core configs
     # ------ Pastebin ------
     # Do you want to use private or public pastes on Pastebin.com ?
     # You can find more info in the readme at https://github.com/spikehidden/CodeRedeemScript
@@ -70,6 +71,7 @@ SpikeCodeRedeemData:
     # As soon as it is possible we'll do it that way.
     devKey: Put Your Key Here!
 
+    # + Add-On configs.
     # ------ Auto Generate ------
     # For these feature you need the Auto Generate Addon
     auto:
@@ -97,14 +99,20 @@ SpikeCodeRedeemData:
         # Set to false to keep the old one but you need to
         # set auto.code to random then or it will throw errors.
         delete: true
+    
+    # ------ Wizebot API -------
+    # For these feature you need the Wizebot Addon
+    wizebot:
+            web:
+                port: 80
 
 
-    # ------ Debug & Log ------
+    #+ ------ Debug & Log ------
     # Shall redemption be logged?
     redemptionLog: true
     logPath: spikehidden/logs/
 
-    # ------ Advanced Settings ------
+    #+ ------ Advanced Settings ------
     # Don't change this unless Pastebin changed their API endpoints
     API:
         endpoint: pastebin.com/api/

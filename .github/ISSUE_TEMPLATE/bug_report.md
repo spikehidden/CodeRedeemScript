@@ -2,7 +2,7 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: bug, Export Format, good first issue
+labels: bug
 assignees: spikehidden
 
 ---

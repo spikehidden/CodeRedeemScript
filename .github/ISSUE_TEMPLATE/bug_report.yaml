@@ -28,31 +28,31 @@ body:
     validations:
       required: true
 
-- type: textarea
-  id: denizen
-  attributes:
-    label: Denizen
-    description: |
-      examples:
-        - **Version**: 1.2.4-SNAPSHOT (build 1766-REL)
-        - **Addons**: Depenizen, ect.
-    value: |
-        - Version:
-        - Addons:
-    validations:
-      required: true
+  - type: textarea
+    id: denizen
+    attributes:
+      label: Denizen
+      description: |
+        examples:
+          - **Version**: 1.2.4-SNAPSHOT (build 1766-REL)
+          - **Addons**: Depenizen, ect.
+      value: |
+          - Version:
+          - Addons:
+      validations:
+        required: true
 
-- type: textarea
-  id: server
-  attributes:
-    label: Server
-    description: The exact output of the `/version` command.
-    placeholder: |
-        Current: git-Purpur-1632 (MC: 1.18.2)*
-        Previous: git-Purpur-1623 (MC: 1.18.2)
-        You are running the latest version
-    validations:
-      required: true
+  - type: textarea
+    id: server
+    attributes:
+      label: Server
+      description: The exact output of the `/version` command.
+      placeholder: |
+          Current: git-Purpur-1632 (MC: 1.18.2)*
+          Previous: git-Purpur-1623 (MC: 1.18.2)
+          You are running the latest version
+      validations:
+        required: true
 
   - type: input
     id: log

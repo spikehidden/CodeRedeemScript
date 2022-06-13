@@ -1,6 +1,6 @@
 name: Bug report
 description: Create a report to help us improve
-title: ''
+
 labels: ["bug"]
 assignees:
   - spikehidden
@@ -39,8 +39,8 @@ body:
       value: |
           - Version:
           - Addons:
-      validations:
-        required: true
+#      validations:
+#        required: true
 
   - type: textarea
     id: server
@@ -51,8 +51,8 @@ body:
           Current: git-Purpur-1632 (MC: 1.18.2)*
           Previous: git-Purpur-1623 (MC: 1.18.2)
           You are running the latest version
-      validations:
-        required: true
+#      validations:
+#        required: true
 
   - type: input
     id: log

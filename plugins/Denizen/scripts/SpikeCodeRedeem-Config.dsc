@@ -71,6 +71,13 @@ SpikeCodeRedeemData:
     # As soon as it is possible we'll do it that way.
     devKey: Put Your Key Here!
 
+    # + Not AddOn specific configs
+    # This setting is used by the following AddOns:
+    # - Wizebot API
+    server:
+        name: My Minecraft Server
+        ip: mc.example.tld
+
     # + Add-On configs.
     # ------ Auto Generate ------
     # For these feature you need the Auto Generate Addon
@@ -99,12 +106,44 @@ SpikeCodeRedeemData:
         # Set to false to keep the old one but you need to
         # set auto.code to random then or it will throw errors.
         delete: true
-    
+
     # ------ Wizebot API -------
     # For these feature you need the Wizebot Addon
     wizebot:
             web:
+                # Only change this if you use nginx or something similar. If you do it anyway Wizebot won't be able to connect to your server.
                 port: 80
+            API:
+                # Set here a SECURE API key.
+                # If set to none it's not usable
+                key: none
+
+            shop:
+                # ID = Uses the item_id to check which commands to assign.
+                # group = Uses the "group" query parameter to get the - Easier
+                # For more info and to get t know how to get the item IDs take a look at the wiki on Github
+                # https://github.com/spikehidden/coderedeemscript/wiki
+                mode: ID
+
+                # Map of group IDs which will be used for group mode.
+                groups:
+                    # Group ID
+                    group_01:
+                        # List of Wizebot item IDs that shall be part of this group.
+                        # Won't be used if mode is set to group
+                        ids:
+                        - 45761
+                        commands:
+                            # The amount of random commands to choose.
+                            amount: 1
+                            # The commands to randomly assign.
+                            # Set amount to 0 to disable
+                            random:
+                            - minecraft:give <p> diamond 64
+                            # A list of commands that are always assigned to a code.
+                            # Set to "alwaysCommand: none" to disable
+                            always:
+                            - minecraft:say <p> redeemed <code>
 
 
     #+ ------ Debug & Log ------

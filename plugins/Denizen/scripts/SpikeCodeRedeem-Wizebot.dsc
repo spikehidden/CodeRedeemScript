@@ -84,5 +84,82 @@ SpikeCodeRedeemWizebotAPI:
     type: world
     debug: true
     events:
-        webserver web request method:post path:/wizebot:
-            -
+        webserver web request method:post path:/wizebot/create:
+            # Get query parameters
+            - define query <context.query>
+            - define code <[query].get[code].if_null[random]>
+            - define queryKey <[query].get[key].if_null[null]>
+            - define duration <[query].get[duration].if_null[unlimited]>
+            - define prefix <[query].get[prefix].if_null[<empty>]>
+            - define group <[query].get[group].if_null[null]>
+
+            # Map POST parameters:
+            - define post <context.body.as_map>
+            - define item_id <[post].get[item_id]>
+            - define item_name <[post].get[item_name]>
+            - define viewer_id <[post].get[item_id]>
+            - define viewer_name <[post].get[item_id]>
+
+            # Get stuff from config
+            - define key <script[SpikeCodeRedeemData].data_key[wizebot.web.key].if_null[none]>
+            - define mode <script[SpikeCodeRedeemData].data_key[wizebot.shop.mode].if_null[ID]>
+            - define groupList <script[SpikeCodeRedeemData].data_key[wizebot.shop.groups].if_null[none]>
+
+            # If key is missing, invalid or not configerured send 401 ERROR
+            - if <[key]> == none || <[queryKey]> != <[key]>:
+                - define answer "UNAUTHORIZED - KEY IS MISSING OR INVALID"
+                - determine code:401 passively
+                - determine headers:[Content-Type=text/plain] passively
+                - determine RAW_TEXT_CONTENT:<[answer]>
+
+            # If nothing is set up in the Config send KO status and ERROR
+            - if <[groupList]> == none:
+                - define text "Configuration Error! - Please tell the Streamer that something went wrong."
+                - define status KO
+                - define answer "{<&dq>status<&dq>: <&dq><[status]><&dq>, <&dq>text_to_return<&dq>: <&dq><[text]><&dq>}"
+                - determine code:200 passively
+                - determine headers:[Content-Type=application/json] passively
+                - determine RAW_TEXT_CONTENT:<[answer]>
+
+            # Get group if in ID mode
+            - if <[mode]> == ID:
+                - foreach <[groupList]>:
+                    - if <[key].get[ids].contains_text[<[item_id]>]>:
+                        - define group <[key]>
+                        - foreach stop
+
+            # Get group Data
+            - define groupData <script[SpikeCodeRedeemData].data_key[wizebot.shop.groups.<[group]>].if_null[none]>
+            - define randomAmount <[groupData].get[amount].if_null[0]>
+            - define random <[groupData].get[commands.random].if_null[null]>
+            - define always <[groupData].get[commands.always].if_null[none]>
+
+            # Add always commands.
+            - if <[always]> != none:
+                - define commands <[always].as_list>
+
+            # Choose radnom commands.
+            - if <[randomAmount]> <= 0 || <[random]> == null:
+                - define commands:->:<[random].random[<[randomAmount]>]>
+
+            # If commands are empty run error.
+            - if !<[commands].exists>:
+                - define text "Configuration Error! - Please tell the Streamer that something went wrong."
+                - define status KO
+                - define answer "{<&dq>status<&dq>: <&dq><[status]><&dq>, <&dq>text_to_return<&dq>: <&dq><[text]><&dq>}"
+                - determine code:200 passively
+                - determine headers:[Content-Type=application/json] passively
+                - determine RAW_TEXT_CONTENT:<[answer]>
+
+            #Inject Code Creation Task
+            - define amount 1
+            - inject SpikeCodeCreateCode
+
+            # Finaly send the code to Wizebot
+            - define text "Your code for <[server.name]> is <&dq><[code]><&dq>"
+            - define status OK
+            - define answer "{<&dq>status<&dq>: <&dq><[status]><&dq>, <&dq>text_to_return<&dq>: <&dq><[text]><&dq>}"
+            - determine code:401 passively
+            - determine headers:[Content-Type=application/json] passively
+            - determine RAW_TEXT_CONTENT:<[answer]>
+

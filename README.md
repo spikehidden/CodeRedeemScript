@@ -70,7 +70,8 @@ Currently we are supporting export formats for easier import of codelists for th
 
 If you want me to support more bots/software then just open an issue to request it and I happily will if possible.
 
-## Commands
+## Commands & Permissions
+### Core Script
 | Command                  | arguments                                                    | Feature                             | Permissions                                                                      |
 | :----------------------- | :----------------------------------------------------------- | :---------------------------------- | :------------------------------------------------------------------------------- |
 | redeemadmin create       | (\<code\>/random) \<amount\> (\<command\>/group)             |  Create a new code                  | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.codes    |
@@ -81,6 +82,10 @@ If you want me to support more bots/software then just open an issue to request 
 | pastebin                 | \<username\> \<password\>                                    |  Get and save your pastebin userkey | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.pastebin |
 | commandgroup             | "\<command1\>" "\<command2\>" (...)                          |  Creates a temporary command group  | spikehidden.admin, spikehidden.coderedeem.admin, spikehidden.coderedeem.codes    |
 
+### Auto Generate Code AddOn
+| Command      | arguments | Feature                                   | Permissions                     |
+| :----------- | :-------- | :---------------------------------------- | :------------------------------ |
+| (No command) |           | Permission to get generated code on join. | spikehidden.coderedeem.autocode |
 
 ## License
 

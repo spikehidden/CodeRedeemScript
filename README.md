@@ -1,3 +1,5 @@
+ ![Code Redeem Script Logo](/Logo/logo%400%2C25x.png)
+
 [![GitHub release](https://img.shields.io/github/release/Spikehidden/CodeRedeemScript?include_prereleases=&sort=semver&color=blue)](https://github.com/Spikehidden/CodeRedeemScript/releases/)
 [![License](https://img.shields.io/github/license/Spikehidden/CodeRedeemScript?logo=Creative%20commons)](#LICENSE)
 [![issues - CodeRedeemScript](https://img.shields.io/github/issues/Spikehidden/CodeRedeemScript)](https://github.com/Spikehidden/CodeRedeemScript/issues)
@@ -10,7 +12,7 @@
 [![GitHub all releases](https://img.shields.io/github/downloads/Spikehidden/CodeRedeemScript/total?logo=github&style=flat)](https://github.com/spikehidden/CodeRedeemScript/releases/latest)
 [![GitHub stars](https://img.shields.io/github/stars/spikehidden/CodeRedeemScript)](https://github.com/spikehidden/CodeRedeemScript/stargazers)
 
-# Spikehidden's Code Redeem Script
+#  Spikehidden's Code Redeem Script
  A Denizen Script do create redeemable codes with pastebin support.
 ## Config
 

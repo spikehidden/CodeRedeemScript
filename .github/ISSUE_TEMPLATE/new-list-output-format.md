@@ -2,7 +2,7 @@
 name: New List output format
 about: Request a new export format for the code list
 title: ''
-labels: Export Format
+labels: new export format
 assignees: spikehidden
 
 ---

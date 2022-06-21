@@ -1,0 +1,65 @@
+name: Bug report
+description: Create a report to help us improve
+
+labels: ["bug"]
+assignees:
+  - spikehidden
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+
+  - type: input
+    id: script-version
+    attributes:
+      label: Script Version
+      description: The version of my script.
+      placeholder: "[e.g. 1.0]"
+    validations:
+      required: true
+
+  - type: textarea
+    id: denizen
+    attributes:
+      label: Denizen
+      description: |
+        examples:
+          - **Version**: 1.2.4-SNAPSHOT (build 1766-REL)
+          - **Addons**: Depenizen, ect.
+      value: |
+          - Version:
+          - Addons:
+#      validations:
+#        required: true
+
+  - type: textarea
+    id: server
+    attributes:
+      label: Server
+      description: The exact output of the `/version` command.
+      placeholder: |
+          Current: git-Purpur-1632 (MC: 1.18.2)*
+          Previous: git-Purpur-1623 (MC: 1.18.2)
+          You are running the latest version
+#      validations:
+#        required: true
+
+  - type: input
+    id: log
+    attributes:
+      label: Log
+      description: |
+          Pastebin Link to the log with the error.
+          Please user [this Pastebin](https://paste.denizenscript.com/New/Log) as it can automaticly censor IPs and chat messages.
+    validations:
+      required: false

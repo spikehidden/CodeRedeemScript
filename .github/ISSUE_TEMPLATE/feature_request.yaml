@@ -1,0 +1,41 @@
+name: Feature request
+description: Create a report to help us improve
+
+labels: ["new feature"]
+assignees:
+  - spikehidden
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill out this form to request a new feature.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the feature
+      description: |
+          A clear and concise description of what shall be added.
+      placeholder: ex. I'd like to be able to do [...] so I can [...]
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternative
+    attributes:
+      label: Alternatives
+      description: |
+          Describe alternatives you've considered.
+          Like maybe other Denizen Scripts which does somthing similar or
+          which we should use features of.
+          (Do not ask for compatibility for actual Plugins that are not from Denizen/Citizen unless you want to be able to get data from user data in YAML files.)
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: More context
+      description: Add any other context or screenshots about the feature request here.
+    validations:
+      required: false

@@ -1,6 +1,6 @@
  ![Code Redeem Script Logo](/Logo/logo%400%2C25x.png)
 
-[![GitHub release](https://img.shields.io/github/release/Spikehidden/CodeRedeemScript?include_prereleases=&sort=semver&color=blue)](https://github.com/Spikehidden/CodeRedeemScript/releases/)
+[![GitHub release](https://img.shields.io/github/release/Spikehidden/CodeRedeemScript?sort=semver&color=blue)](https://github.com/Spikehidden/CodeRedeemScript/releases/)
 [![License](https://img.shields.io/github/license/Spikehidden/CodeRedeemScript?logo=Creative%20commons)](#LICENSE)
 [![issues - CodeRedeemScript](https://img.shields.io/github/issues/Spikehidden/CodeRedeemScript)](https://github.com/Spikehidden/CodeRedeemScript/issues)
 

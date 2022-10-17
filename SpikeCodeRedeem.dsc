@@ -37,8 +37,8 @@
 #
 # @author Spikehidden
 # @date 2022/06/10
-# @denizen-build 1.2.4-SNAPSHOT (build 1766-REL)
-# @script-version 1.0
+# @denizen-build 1.2.5-SNAPSHOT (build 6477-DEV)
+# @script-version 1.1.1
 #
 # + REQUIREMENTS +
 # - None
@@ -180,11 +180,11 @@ SpikeCodeRedeemCreateList:
     script:
     - choose <[format]>:
         - case list:
-            - ~log <[paste_content]> type:none file:plugins/denizen/spikehidden/code_redeem/codes/<[paste_name]>.txt
+            - ~log <[paste_content]> type:none file:plugins/Denizen/spikehidden/code_redeem/codes/<[paste_name]>.txt
         - case wizebot:
-            - ~log <[paste_content]> type:none file:plugins/denizen/spikehidden/code_redeem/codes/<[paste_name]>.csv
+            - ~log <[paste_content]> type:none file:plugins/Denizen/spikehidden/code_redeem/codes/<[paste_name]>.csv
         - default:
-            - ~log <[paste_content]> type:none file:plugins/denizen/spikehidden/code_redeem/codes/<[paste_name]>.txt
+            - ~log <[paste_content]> type:none file:plugins/Denizen/spikehidden/code_redeem/codes/<[paste_name]>.txt
 
 # ++++++ World ++++++
 SpikeCodeRedeemSystem:

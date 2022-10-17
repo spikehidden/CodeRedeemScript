@@ -105,7 +105,7 @@ SpikeCodeCreateCode:
     script:
     # Check if a random code shall be generated
     - if <[code]> == random:
-        - ~webget https://random.justyy.workers.dev/api/random/?n=8&x=6 save:newcode
+        - ~webget https://www.random.org/strings/?num=1&len=8&digits=on&upperalpha=off&loweralpha=on&unique=on&format=plain&rnd=new save:newcode
         - define code <entry[newcode].result.replace_text[<&dq>]>
         - define code <[code].replace_text[<&nl>]>
         - if <[prefix].exists>:
@@ -598,9 +598,9 @@ SpikeCodeRedeemBulkCreate:
     - else:
         # Check if a random group shall be generated
         - if <[group]> == random:
-            - ~webget https://random.justyy.workers.dev/api/random/?n=8&x=6 save:newgroup
+            - ~webget https://www.random.org/strings/?num=1&len=8&digits=on&upperalpha=off&loweralpha=on&unique=on&format=plain&rnd=new save:newgroup
             - while <server.has_flag[redeemableGroups.<entry[newgroup].result.replace_text[<&dq>]>]>:
-                - ~webget https://random.justyy.workers.dev/api/random/?n=8&x=6 save:newgroup
+                - ~webget https://www.random.org/strings/?num=1&len=8&digits=on&upperalpha=off&loweralpha=on&unique=on&format=plain&rnd=new save:newgroup
                 - if <[loop_index].if_null[1]> >= 10:
                     - narrate 'Could not create an unused random code group name. Try again or if this error persists open an issue on GitHub.'
                     - stop

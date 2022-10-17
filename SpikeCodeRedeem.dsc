@@ -100,31 +100,44 @@ SpikeCodeRedeemUpdate:
 SpikeCodeCreateCode:
     type: task
     debug: false
-    definitions: code|amount|command|permission|prefix
+    definitions: code|amount|command|permission|prefix|code_amount|group
 
     script:
     # Check if a random code shall be generated
     - if <[code]> == random:
-        - ~webget https://www.random.org/strings/?num=1&len=8&digits=on&upperalpha=off&loweralpha=on&unique=on&format=plain&rnd=new save:newcode
-        - define code <entry[newcode].result.replace_text[<&dq>]>
-        - define code <[code].replace_text[<&nl>]>
+        - define url https://www.random.org/strings/?num=<[code_amount].if_null[1]>&len=8&digits=on&upperalpha=off&loweralpha=on&unique=on&format=plain&rnd=new
+        - ~webget <[url]> save:newcodelist
+        - define newCodeList <entry[newcode].result.split[<&nl>]>
+        # - define code <entry[newcode].result.replace_text[<&dq>]>
+        # - define code <[code].replace_text[<&nl>]>
+        # - if <[prefix].exists>:
+        #     - define code <[prefix]><[code]>
+    - else:
+        - define newCodeList <list[<[code]>]>
+    - define codeList <list>
+    - foreach <[newCodeList]> as:code:
+        # Add prefix
         - if <[prefix].exists>:
             - define code <[prefix]><[code]>
-    # Sets the amount how often the code can be used.
-    - flag server redeemableCodes.<[code]>.amount:<[amount]>
-    # Sets the commands that shall be executed!
-    - if <[command]> == group:
-        - flag server redeemableCodes.<[code]>.commands:<player.flag[spikehidden.coderedeem.commandgroup]>
-    - else:
-        - flag server redeemableCodes.<[code]>.commands:<list>
-        - flag server redeemableCodes.<[code]>.commands:->:<[command]>
-    # Check if a permission shall be set.
-    - if <[permission]> != null:
-        - define msg 'The code "<[code]>" with <[amount]> possible redemption(s) and the "<[permission]>" permission required was created!'
-        - flag server redeemableCodes.<[code]>.permission:<[permission]>
-    # If so set the permission.
-    - else:
-        - define msg 'The code "<[code]>" with <[amount]> possible redemption was created!'
+        # Sets the amount how often the code can be used.
+        - flag server redeemableCodes.<[code]>.amount:<[amount]>
+        # Sets the commands that shall be executed!
+        - if <[command]> == group:
+            - flag server redeemableCodes.<[code]>.commands:<player.flag[spikehidden.coderedeem.commandgroup]>
+        - else:
+            - flag server redeemableCodes.<[code]>.commands:<list>
+            - flag server redeemableCodes.<[code]>.commands:->:<[command]>
+        # Add code group if existing
+        - if <[group].exists>:
+            - flag server redeemableCodes.<[code]>.group:<[group]>
+            - flag server redeemableGroups.<[group]>.codes:->:<[code]>
+        # Check if a permission shall be set.
+        - if <[permission]> != null:
+            - define msg 'The code "<[code]>" with <[amount]> possible redemption(s) and the "<[permission]>" permission required was created!'
+            - flag server redeemableCodes.<[code]>.permission:<[permission]>
+        # If so set the permission.
+        - else:
+            - define msg 'The code "<[code]>" with <[amount]> possible redemption was created!'
 
 # + Send Code List to Pastebin +
 SpikeCodeSendPastebin:
@@ -607,13 +620,8 @@ SpikeCodeRedeemBulkCreate:
             - define group <entry[newgroup].result.replace_text[<&dq>]>
         # Sets the amount how may codes are in the group.
         - flag server redeemableGroups.<[group]>.amount:<[amount]>
-        # Creates the specified amount of codes.
-        - while <[loop_index].if_null[1]> <= <[groupAmount].sub[1]>:
-            - define code random
-            # Inject Code creation script
-            - inject SpikeCodeCreateCode
-            - flag server redeemableCodes.<[code]>.group:<[group]>
-            - flag server redeemableGroups.<[group]>.codes:->:<[code]>
+        # Creates the specified amount of codes by injecting Code creation script
+        - inject SpikeCodeCreateCode
         # Sets the commands that shall be executed!
         - flag server redeemableGroups.<[group]>.commands:<list>
         - flag server redeemableGroups.<[group]>.commands:->:<[command]>

@@ -37,8 +37,8 @@
 #
 # @author Spikehidden
 # @date 2022/06/10
-# @denizen-build 1.2.4-SNAPSHOT (build 1766-REL)
-# @script-version 1.0
+# @denizen-build 1.2.5-SNAPSHOT (build 6477-DEV)
+# @script-version 1.1.1
 #
 # + REQUIREMENTS +
 # - None
@@ -79,34 +79,47 @@ SpikeCodeRedeemUpdate:
 SpikeCodeCreateCode:
     type: task
     debug: false
-    definitions: code|amount|command|permission|prefix
+    definitions: code|amount|command|permission|prefix|code_amount|group
 
     script:
     # Check if a random code shall be generated
     - if <[code]> == random:
-        - ~webget https://random.justyy.workers.dev/api/random/?n=8&x=6 save:newcode
-        - define code <entry[newcode].result.replace_text[<&dq>]>
-        - define code <[code].replace_text[<&nl>]>
+        - define url https://www.random.org/strings/?num=<[code_amount].if_null[1]>&len=8&digits=on&upperalpha=off&loweralpha=on&unique=on&format=plain&rnd=new
+        - ~webget <[url]> save:newcodelist
+        - define newCodeList <entry[newcode].result.split[<&nl>]>
+        # - define code <entry[newcode].result.replace_text[<&dq>]>
+        # - define code <[code].replace_text[<&nl>]>
+        # - if <[prefix].exists>:
+        #     - define code <[prefix]><[code]>
+    - else:
+        - define newCodeList <list[<[code]>]>
+    - define codeList <list>
+    - foreach <[newCodeList]> as:code:
+        # Add prefix
         - if <[prefix].exists>:
             - define code <[prefix]><[code]>
-    # Sets the amount how often the code can be used.
-    - if <[duration]> != unlimited:
+        # Sets the amount how often the code can be used.
+        - if <[duration]> != unlimited:
         - flag server redeemableCodes.<[code]> expire:<[duration]>
     - flag server redeemableCodes.<[code]>.amount:<[amount]>
-    # Sets the commands that shall be executed!
-    - if <[command]> == group:
-        - flag server redeemableCodes.<[code]>.commands:<player.flag[spikehidden.coderedeem.commandgroup]>
-    - else:
-        - flag server redeemableCodes.<[code]>.commands:<list>
-        - flag server redeemableCodes.<[code]>.commands:->:<[command]>
-    # Check if a permission shall be set.
-    # Not used at the moment
+        # Sets the commands that shall be executed!
+        - if <[command]> == group:
+            - flag server redeemableCodes.<[code]>.commands:<player.flag[spikehidden.coderedeem.commandgroup]>
+        - else:
+            - flag server redeemableCodes.<[code]>.commands:<list>
+            - flag server redeemableCodes.<[code]>.commands:->:<[command]>
+        # Add code group if existing
+        - if <[group].exists>:
+            - flag server redeemableCodes.<[code]>.group:<[group]>
+            - flag server redeemableGroups.<[group]>.codes:->:<[code]>
+        # Check if a permission shall be set.
+        # Not used at the moment
     - if <[permission]> != null:
-        - define msg 'The code "<[code]>" with <[amount]> possible redemption(s) and the "<[permission]>" permission required was created!'
-        - flag server redeemableCodes.<[code]>.permission:<[permission]>
-    # If so set the permission.
-    - else:
-        - define msg 'The code "<[code]>" with <[amount]> possible redemption was created!'
+            - define msg 'The code "<[code]>" with <[amount]> possible redemption(s) and the "<[permission]>" permission required was created!'
+            - flag server redeemableCodes.<[code]>.permission:<[permission]>
+        # If so set the permission.
+        - else:
+            - define msg 'The code "<[code]>" with <[amount]> possible redemption was created!'
 
 # + Send Code List to Pastebin +
 SpikeCodeSendPastebin:
@@ -149,11 +162,11 @@ SpikeCodeRedeemCreateList:
     script:
     - choose <[format]>:
         - case list:
-            - ~log <[paste_content]> type:none file:plugins/denizen/spikehidden/code_redeem/codes/<[paste_name]>.txt
+            - ~log <[paste_content]> type:none file:plugins/Denizen/spikehidden/code_redeem/codes/<[paste_name]>.txt
         - case wizebot:
-            - ~log <[paste_content]> type:none file:plugins/denizen/spikehidden/code_redeem/codes/<[paste_name]>.csv
+            - ~log <[paste_content]> type:none file:plugins/Denizen/spikehidden/code_redeem/codes/<[paste_name]>.csv
         - default:
-            - ~log <[paste_content]> type:none file:plugins/denizen/spikehidden/code_redeem/codes/<[paste_name]>.txt
+            - ~log <[paste_content]> type:none file:plugins/Denizen/spikehidden/code_redeem/codes/<[paste_name]>.txt
 
 # ++++++ World ++++++
 SpikeCodeRedeemSystem:
@@ -595,9 +608,9 @@ SpikeCodeRedeemBulkCreate:
     - else:
         # Check if a random group shall be generated
         - if <[group]> == random:
-            - ~webget https://random.justyy.workers.dev/api/random/?n=8&x=6 save:newgroup
+            - ~webget https://www.random.org/strings/?num=1&len=8&digits=on&upperalpha=off&loweralpha=on&unique=on&format=plain&rnd=new save:newgroup
             - while <server.has_flag[redeemableGroups.<entry[newgroup].result.replace_text[<&dq>]>]>:
-                - ~webget https://random.justyy.workers.dev/api/random/?n=8&x=6 save:newgroup
+                - ~webget https://www.random.org/strings/?num=1&len=8&digits=on&upperalpha=off&loweralpha=on&unique=on&format=plain&rnd=new save:newgroup
                 - if <[loop_index].if_null[1]> >= 10:
                     - narrate 'Could not create an unused random code group name. Try again or if this error persists open an issue on GitHub.'
                     - stop
@@ -607,13 +620,8 @@ SpikeCodeRedeemBulkCreate:
             - flag server redeemableGroups.<[group]> expire:<[duration]>
         # Sets the amount how may codes are in the group.
         - flag server redeemableGroups.<[group]>.amount:<[amount]>
-        # Creates the specified amount of codes.
-        - while <[loop_index].if_null[1]> <= <[groupAmount].sub[1]>:
-            - define code random
-            # Inject Code creation script
-            - inject SpikeCodeCreateCode
-            - flag server redeemableCodes.<[code]>.group:<[group]>
-            - flag server redeemableGroups.<[group]>.codes:->:<[code]>
+        # Creates the specified amount of codes by injecting Code creation script
+        - inject SpikeCodeCreateCode
         # Sets the commands that shall be executed!
         - flag server redeemableGroups.<[group]>.commands:<list>
         - flag server redeemableGroups.<[group]>.commands:->:<[command]>

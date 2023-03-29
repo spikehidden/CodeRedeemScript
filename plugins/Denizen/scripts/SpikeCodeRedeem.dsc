@@ -79,14 +79,14 @@ SpikeCodeRedeemUpdate:
 SpikeCodeCreateCode:
     type: task
     debug: false
-    definitions: code|amount|command|permission|prefix|code_amount|group
+    definitions: code|amount|command|permission|prefix|code_amount|group|commands
 
     script:
     # Check if a random code shall be generated
     - if <[code]> == random:
         - define url https://www.random.org/strings/?num=<[code_amount].if_null[1]>&len=8&digits=on&upperalpha=off&loweralpha=on&unique=on&format=plain&rnd=new
         - ~webget <[url]> save:newcodelist
-        - define newCodeList <entry[newcode].result.split[<&nl>]>
+        - define newCodeList <entry[newcodelist].result.split[<&nl>]>
         # - define code <entry[newcode].result.replace_text[<&dq>]>
         # - define code <[code].replace_text[<&nl>]>
         # - if <[prefix].exists>:
@@ -94,27 +94,23 @@ SpikeCodeCreateCode:
     - else:
         - define newCodeList <list[<[code]>]>
     - define codeList <list>
-    - foreach <[newCodeList]> as:code:
+    - foreach <[newCodeList]> as:value:
+        - define code <[value]>
         # Add prefix
         - if <[prefix].exists>:
             - define code <[prefix]><[code]>
-        # Sets the amount how often the code can be used.
-        - if <[duration]> != unlimited:
-        - flag server redeemableCodes.<[code]> expire:<[duration]>
-    - flag server redeemableCodes.<[code]>.amount:<[amount]>
+    # Sets the amount how often the code can be used.
+        - flag server redeemableCodes.<[code]>.amount:<[amount]>
         # Sets the commands that shall be executed!
-        - if <[command]> == group:
+        - if <[commands].exists>:
+            - flag server redeemableCodes.<[code]>.commands:<[commands]>
+        - else if <[command]> == group:
             - flag server redeemableCodes.<[code]>.commands:<player.flag[spikehidden.coderedeem.commandgroup]>
         - else:
             - flag server redeemableCodes.<[code]>.commands:<list>
             - flag server redeemableCodes.<[code]>.commands:->:<[command]>
-        # Add code group if existing
-        - if <[group].exists>:
-            - flag server redeemableCodes.<[code]>.group:<[group]>
-            - flag server redeemableGroups.<[group]>.codes:->:<[code]>
         # Check if a permission shall be set.
-        # Not used at the moment
-    - if <[permission]> != null:
+        - if <[permission].if_null[null]> != null:
             - define msg 'The code "<[code]>" with <[amount]> possible redemption(s) and the "<[permission]>" permission required was created!'
             - flag server redeemableCodes.<[code]>.permission:<[permission]>
         # If so set the permission.

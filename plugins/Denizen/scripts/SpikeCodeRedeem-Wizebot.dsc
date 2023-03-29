@@ -64,18 +64,18 @@ SpikeCodeRedeemWizebotSystem:
     debug: true
     events:
         #- Check if core script is loaded
-        on server start:
+        on scripts loaded:
             - if <server.has_flag[SpikehiddenUpdater]>:
                 - announce "<&ss>9[SpikeCodeRedeem]<&ss>r Spikehidden's Auto Updater has been found!" to_console
                 - flag server SpikeCodeRedeemAutoUpdate:github
                 - flag server SpikehiddenUpdater.data:->:SpikeCodeRedeemAutoUpdate
                 - announce "<&ss>9[SpikeCodeRedeem]<&ss>r Providing Update data of Auto Generate Addon for Spikehidden's Auto Updater" to_console
-        after server start:
+        after scripts loaded:
             - if <server.has_flag[SpikeCodeRedeem]>:
                 - define port <script[SpikeCodeRedeemData].data_key[wizebot.web.port]>
                 - flag server SpikeCodeRedeem.addon.wizebot
                 - announce "<&ss>9[SpikeCodeRedeem]<&ss>r Add-On <&dq>Wizebot<&dq> is loaded." to_console
-                - webserver start
+                - webserver start port:<[port]>
             - else:
                 - announce "<&ss>9[SpikeCodeRedeem]<&ss>r Add-On <&dq>Wizebot<&dq> can't be used without core script." to_console
                 - announce "<&ss>9[SpikeCodeRedeem]<&ss>r Download core script from https://github.com/spikehidden/CodeRedeemScript" to_console
@@ -84,7 +84,7 @@ SpikeCodeRedeemWizebotAPI:
     type: world
     debug: true
     events:
-        webserver web request method:post path:/wizebot/create:
+        on webserver web request method:post path:/wizebot/create:
             # Get query parameters
             - define query <context.query>
             - define code <[query].get[code].if_null[random]>
@@ -93,15 +93,24 @@ SpikeCodeRedeemWizebotAPI:
             - define prefix <[query].get[prefix].if_null[<empty>]>
             - define group <[query].get[group].if_null[null]>
 
+            #headers
+            - define heads <context.headers>
+            - define type <[heads].get[content-type].get[1]>
+            - define boundary <[type].replace_text[multipart/form-data; boundary=]>
+
             # Map POST parameters:
-            - define post <context.body.as_map>
-            - define item_id <[post].get[item_id]>
-            - define item_name <[post].get[item_name]>
-            - define viewer_id <[post].get[item_id]>
-            - define viewer_name <[post].get[item_id]>
+            - define prepost <context.body.replace_text[Content-Disposition: form-data; name=<&dq>]>
+            - define prepost <[prepost].split[<&chr[000D]><&chr[000A]>]>
+            - define prepost <[prepost].separated_by[]>
+            - define post_list <[prepost].split[--<[boundary]>].remove[first].remove[last]>
+            - define post <[post_list].to_map[<&dq>]>
+            - define item_id <[post].get[item_id].if_null[null]>
+            - define item_name <[post].get[item_name].if_null[null]>
+            - define viewer_id <[post].get[item_id].if_null[null]>
+            - define viewer_name <[post].get[item_id].if_null[null]>
 
             # Get stuff from config
-            - define key <script[SpikeCodeRedeemData].data_key[wizebot.web.key].if_null[none]>
+            - define key <script[SpikeCodeRedeemData].data_key[wizebot.api.key].if_null[none]>
             - define mode <script[SpikeCodeRedeemData].data_key[wizebot.shop.mode].if_null[ID]>
             - define groupList <script[SpikeCodeRedeemData].data_key[wizebot.shop.groups].if_null[none]>
 
@@ -116,50 +125,55 @@ SpikeCodeRedeemWizebotAPI:
             - if <[groupList]> == none:
                 - define text "Configuration Error! - Please tell the Streamer that something went wrong."
                 - define status KO
-                - define answer "{<&dq>status<&dq>: <&dq><[status]><&dq>, <&dq>text_to_return<&dq>: <&dq><[text]><&dq>}"
+                - definemap answer:
+                    status: <[status]>
+                    text_to_return: <[text]>
                 - determine code:200 passively
                 - determine headers:[Content-Type=application/json] passively
-                - determine RAW_TEXT_CONTENT:<[answer]>
+                - determine RAW_TEXT_CONTENT:<[answer].to_json>
 
             # Get group if in ID mode
             - if <[mode]> == ID:
                 - foreach <[groupList]>:
-                    - if <[key].get[ids].contains_text[<[item_id]>]>:
+                    - if <[value].get[ids].contains_text[<[item_id]>]>:
                         - define group <[key]>
                         - foreach stop
 
             # Get group Data
             - define groupData <script[SpikeCodeRedeemData].data_key[wizebot.shop.groups.<[group]>].if_null[none]>
-            - define randomAmount <[groupData].get[amount].if_null[0]>
-            - define random <[groupData].get[commands.random].if_null[null]>
-            - define always <[groupData].get[commands.always].if_null[none]>
+            - define randomAmount <[groupData].deep_get[commands.amount].if_null[0]>
+            - define random <[groupData].deep_get[commands.random].if_null[null]>
+            - define always <[groupData].deep_get[commands.always].if_null[none]>
 
             # Add always commands.
             - if <[always]> != none:
-                - define commands <[always].as_list>
+                - define commands <[always].as[list]>
 
             # Choose radnom commands.
-            - if <[randomAmount]> <= 0 || <[random]> == null:
+            - if <[randomAmount]> >= 1 && <[random]> != null:
                 - define commands:->:<[random].random[<[randomAmount]>]>
 
             # If commands are empty run error.
-            - if !<[commands].exists>:
+            - if <[commands].if_null[<list>].is_empty>:
                 - define text "Configuration Error! - Please tell the Streamer that something went wrong."
                 - define status KO
-                - define answer "{<&dq>status<&dq>: <&dq><[status]><&dq>, <&dq>text_to_return<&dq>: <&dq><[text]><&dq>}"
+                - definemap answer:
+                    text_to_return: <[text]>
+                    status: <[status]>
                 - determine code:200 passively
                 - determine headers:[Content-Type=application/json] passively
-                - determine RAW_TEXT_CONTENT:<[answer]>
+                - determine RAW_TEXT_CONTENT:<[answer].to_json>
 
             #Inject Code Creation Task
             - define amount 1
+            - define permission null
             - inject SpikeCodeCreateCode
 
             # Finaly send the code to Wizebot
-            - define text "Your code for <[server.name]> is <&dq><[code]><&dq>"
-            - define status OK
-            - define answer "{<&dq>status<&dq>: <&dq><[status]><&dq>, <&dq>text_to_return<&dq>: <&dq><[text]><&dq>}"
-            - determine code:401 passively
-            - determine headers:[Content-Type=application/json] passively
-            - determine RAW_TEXT_CONTENT:<[answer]>
+            - definemap answer:
+                text_to_return: Your code for Foxcraft is: <[code]>
+                status: OK
+            - determine passively code:200
+            - determine passively headers:[Content-Type=application/json]
+            - determine RAW_TEXT_CONTENT:<[answer].to_json>
 

@@ -132,18 +132,18 @@ SpikeCodeRedeemData:
                         # List of Wizebot item IDs that shall be part of this group.
                         # Won't be used if mode is set to group
                         ids:
-                        - 45761
+                        - 64509
                         commands:
                             # The amount of random commands to choose.
                             amount: 1
                             # The commands to randomly assign.
                             # Set amount to 0 to disable
                             random:
-                            - minecraft:give <p> diamond 64
+                            - minecraft:give <&lt>p<&gt> diamond 64
                             # A list of commands that are always assigned to a code.
                             # Set to "alwaysCommand: none" to disable
                             always:
-                            - minecraft:say <p> redeemed <code>
+                            - minecraft:say <&lt>p<&gt> redeemed <[code]>
 
 
     #+ ------ Debug & Log ------
